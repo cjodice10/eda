@@ -1,7 +1,7 @@
 #' @title get_numeric_bins
 #'
 #' @description Numeric grouping
-#' 
+#'
 #' @param df A dataframe you are wanting to analyze
 #' @param dv The name of the dependent variable (dv).  Example: 'target'
 #' @param dv.type Can take on 1 of two inpunts - c('Binary','Frequency').  Both should be numeric.  If 'Frequency' is the input, it should be the numerator (if it is a rate).  The denominator will be specified as a separate parameter
@@ -12,10 +12,10 @@
 #' @param binning.Type The type of binning to use when splitting the variable.  One of two can be selected: c("Bucketing","Quantiles")
 #' @param monotonic Logical TRUE/FALSE input.  If TRUE, it will force the bins to be monotonic based on the event rate
 #' @param tracking Logical TRUE/FALSE input.  If set to TRUE, the user will be able to see what variable the function is analyzing.
-#' 
+#'
 #' @return A list of dataframes.  First in the list will be 'Numeric_eda' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'numeric_iv' - This is a dataframe with each variable processed and their information value.  The last is 'numeric_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_numeric_logic(logic_df=numeric_logics)
 #' @export
-#get binning
+
 get_numeric_bins<-function(  df                           # dataframe
                             ,dv                           # Dependent Varaible
                             ,dv.type                      # Binary, Frequency
@@ -68,7 +68,7 @@ get_numeric_bins<-function(  df                           # dataframe
   if(min.Pct<=0 | min.Pct >=1){
     stop("min.Pct must be between 0 and 1:  (0,1)")
   }
-  
+
   #remove dv and denom from varlist
   var.list = var.list[var.list %ni% c(dv, dv.denominator)]
 
@@ -203,7 +203,7 @@ get_numeric_bins<-function(  df                           # dataframe
 
     #max rows
     max.orig.rows<- nrow(roll.up.adj.nomiss);
-    
+
     a<-1;
 
     while(a<max.orig.rows  & isTRUE(monotonic)){
@@ -220,7 +220,7 @@ get_numeric_bins<-function(  df                           # dataframe
       br_a<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a,"EventRate"];
       br_b<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==b,"EventRate"];
       br_c<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==c,"EventRate"];
-      
+
 
       #get intervals;
       binprev <- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==c,"UpperBound"];
@@ -241,14 +241,14 @@ get_numeric_bins<-function(  df                           # dataframe
           if(tracking==T && monotonic.f==1){print("Looping through because DV is not monotonic...")}
 
           #create table with only the records needed and all columns;
-          #roll.up.adj.nomiss_new<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a | 
+          #roll.up.adj.nomiss_new<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a |
           #                                              roll.up.adj.nomiss$bin_id==b,];
-          roll.up.adj.nomiss_new<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a | 
-                                                      roll.up.adj.nomiss$bin_id==b | 
+          roll.up.adj.nomiss_new<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a |
+                                                      roll.up.adj.nomiss$bin_id==b |
                                                       roll.up.adj.nomiss$bin_id==c,];
-          
+
           rownames(roll.up.adj.nomiss_new)<-NULL;
-          
+
           #get differences EventRate
           curr_event_rate = roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id==a),"EventRate"]
 
@@ -261,8 +261,8 @@ get_numeric_bins<-function(  df                           # dataframe
           if((sgn==1 & a !=1  & roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(b)),"EventRate"]==0 & roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(b)),"Records"]/NbrRecords < min.Pct)){
             bin_id_to_merge_with = roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(b)),"bin_id"]
           }
-          
-        
+
+
           if(nrow(roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(c)),])>0){
             if((sgn==-1 & a !=1 & roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(c)),"EventRate"]==0 & roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(c)),"Records"]/NbrRecords < min.Pct)){
               bin_id_to_merge_with = roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(c)),"bin_id"]
@@ -283,7 +283,7 @@ get_numeric_bins<-function(  df                           # dataframe
             data.frame();
           roll.up.adj.nomiss_new2<- roll.up.adj.nomiss_new2[order(roll.up.adj.nomiss_new2$UpperBound),]
           rownames(roll.up.adj.nomiss_new2)<-NULL;
-          
+
           #create metrics;
           if(dv.type=="Binary")   {roll.up.adj.nomiss_new2$EventRate<- ifelse(is.na(roll.up.adj.nomiss_new2$Events/roll.up.adj.nomiss_new2$Records) ,0,roll.up.adj.nomiss_new2$Events/roll.up.adj.nomiss_new2$Records*100)};
           if(dv.type=="Frequency"){roll.up.adj.nomiss_new2$EventRate<- ifelse(is.na(roll.up.adj.nomiss_new2$Events/roll.up.adj.nomiss_new2$Exposure),0,roll.up.adj.nomiss_new2$Events/roll.up.adj.nomiss_new2$Exposure*100)};
@@ -301,10 +301,10 @@ get_numeric_bins<-function(  df                           # dataframe
 
           #reassign bin_id;
           roll.up.adj.nomiss$bin_id<-1:nrow(roll.up.adj.nomiss);
-          
+
           #reorder
           roll.up.adj.nomiss<- roll.up.adj.nomiss[,c("Variable","bin_id","UpperBound","Records","Exposure","Events","EventRate")];
-          
+
           a<- 1;
           max.orig.rows<-max(roll.up.adj.nomiss$bin_id);
           monotonic.f<-monotonic.f+1;
@@ -331,15 +331,15 @@ get_numeric_bins<-function(  df                           # dataframe
     roll.up.adj.nomiss<- roll.up.adj.nomiss[order(roll.up.adj.nomiss$bin_id),];
 
     roll.up.adj.nomiss$bin_id<-1:nrow(roll.up.adj.nomiss);
-    
+
     #reorder
     roll.up.adj.nomiss<- roll.up.adj.nomiss[,c("Variable","bin_id","UpperBound","Records","Exposure","Events","EventRate")];
 
-    
+
     ################################
     ### Percent of Records Check ###
     ################################
-    
+
     #Check the percent of records in each bin;
     numbRows<- nrow(roll.up.adj.nomiss);
 
@@ -348,7 +348,7 @@ get_numeric_bins<-function(  df                           # dataframe
 
       #set j as the next bin;
       #b<- ifelse(a+1 != numbRows, a+1, numbRows);
-      
+
       #set b as the next bin;
       b<- ifelse(a+1 != nrow(roll.up.adj.nomiss), a+1, nrow(roll.up.adj.nomiss));
       c<- ifelse(a ==1, 0,ifelse(a+1==nrow(roll.up.adj.nomiss),0,a-1))
@@ -360,20 +360,20 @@ get_numeric_bins<-function(  df                           # dataframe
       br_a_e<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a,"EventRate"];
       br_b_e<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==b,"EventRate"];
       br_c_e<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==c,"EventRate"];
-      
+
       br_a<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a,"PctRecords"];
       br_b<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==b,"PctRecords"];
       br_c<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==c,"PctRecords"];
-      
+
       #get intervals;
       binprev_e <- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==c,"UpperBound"];
       binstart_e<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a,"UpperBound"];
       binend_e<-   roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==b,"UpperBound"];
-      
+
       binprev <- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==c,"PctRecords"];
       binstart<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a,"PctRecords"];
       binend<-   roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==b,"PctRecords"];
-      
+
       #print('head of roll.up.adj.miss');print(head(roll.up.adj.miss))
       if(is.na(binstart) | is.nan(binstart) | is.null(binstart) | binstart=="<NA>"|is.na(binstart) | is.nan(binend) | is.null(binend) | binend=="<NA>")
       {
@@ -388,25 +388,25 @@ get_numeric_bins<-function(  df                           # dataframe
 
           #create table with only the records needed and all columns;
           #roll.up.adj.nomiss_new<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a | roll.up.adj.nomiss$bin_id==b,];
-          roll.up.adj.nomiss_new<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a | 
-                                                      roll.up.adj.nomiss$bin_id==b | 
+          roll.up.adj.nomiss_new<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a |
+                                                      roll.up.adj.nomiss$bin_id==b |
                                                       roll.up.adj.nomiss$bin_id==c,];
-          
+
           rownames(roll.up.adj.nomiss_new)<-NULL;
 
           #get differences EventRate
           curr_event_rate = roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id==a),"EventRate"]
-          
+
           event_rate_checks      = roll.up.adj.nomiss_new[roll.up.adj.nomiss_new$bin_id %in% c(b,c),c("bin_id","EventRate")]
           event_rate_checks$diff = abs(event_rate_checks$EventRate - curr_event_rate)
           event_rate_checks      = event_rate_checks[order(event_rate_checks$diff),]
           bin_id_to_merge_with   = event_rate_checks[1,"bin_id"]
-          
+
           #create new bin id and set it both the same;
           #roll.up.adj.nomiss_new$bin_id<- a;
           roll.up.adj.nomiss_new        = roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(a,bin_id_to_merge_with)),]
           roll.up.adj.nomiss_new$bin_id = bin_id_to_merge_with  #this is new
-          
+
           roll.up.adj.nomiss_new2<- roll.up.adj.nomiss_new %>%
             dplyr::group_by(Variable,bin_id) %>%
             dplyr::summarise(UpperBound=max(UpperBound)
@@ -427,7 +427,7 @@ get_numeric_bins<-function(  df                           # dataframe
           #remove rows a and b;
           roll.up.adj.nomiss<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id !=a,];
           roll.up.adj.nomiss<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id !=bin_id_to_merge_with,];
-          
+
           #add in new rows;
           roll.up.adj.nomiss<- bind_rows(roll.up.adj.nomiss_new2,roll.up.adj.nomiss);
           roll.up.adj.nomiss$bin_id<- NULL;
@@ -437,7 +437,7 @@ get_numeric_bins<-function(  df                           # dataframe
 
           #reassign bin_id;
           roll.up.adj.nomiss$bin_id<-1:nrow(roll.up.adj.nomiss);
-          
+
           #reorder
           roll.up.adj.nomiss<- roll.up.adj.nomiss[,c("Variable","bin_id","UpperBound","Records","Exposure","Events","EventRate")];
 
@@ -457,11 +457,11 @@ get_numeric_bins<-function(  df                           # dataframe
       #ID last two rows
       roll.up.adj.nomiss$last_2_rows = ifelse(roll.up.adj.nomiss$bin_id == max(roll.up.adj.nomiss$bin_id) |
                                               roll.up.adj.nomiss$bin_id == (max(roll.up.adj.nomiss$bin_id)-1),1,0)
-      
+
       last_row_pct     = roll.up.adj.nomiss[which(roll.up.adj.nomiss$bin_id==max(roll.up.adj.nomiss$bin_id)),"PctRecords"]
       second_2last_pct = roll.up.adj.nomiss[which(roll.up.adj.nomiss$bin_id==(max(roll.up.adj.nomiss$bin_id)-1)),"PctRecords"]
       second_2last_id  = roll.up.adj.nomiss[which(roll.up.adj.nomiss$bin_id==(max(roll.up.adj.nomiss$bin_id)-1)),"bin_id"]
-      
+
       if(last_row_pct<min.Pct){
 
         roll.up.adj.nomiss$bin_id = ifelse(roll.up.adj.nomiss$last_2_rows==1,second_2last_id,roll.up.adj.nomiss$bin_id)
@@ -472,19 +472,19 @@ get_numeric_bins<-function(  df                           # dataframe
                            ,Exposure =sum(Exposure)
                            ,Events   =sum(Events))%>%
           data.frame();
-        
+
         roll.up.adj.nomiss$last_2_rows=NULL
-        
+
         #create metrics;
         if(dv.type=="Binary")   {roll.up.adj.nomiss$EventRate<- ifelse(is.na(roll.up.adj.nomiss$Events/roll.up.adj.nomiss$Records) ,0,round(roll.up.adj.nomiss$Events/roll.up.adj.nomiss$Records*100,4))};
         if(dv.type=="Frequency"){roll.up.adj.nomiss$EventRate<- ifelse(is.na(roll.up.adj.nomiss$Events/roll.up.adj.nomiss$Exposure),0,round(roll.up.adj.nomiss$Events/roll.up.adj.nomiss$Exposure*100,4))};
 
       }
     }
-    
+
     #reorder
     roll.up.adj.nomiss<- roll.up.adj.nomiss[,c("Variable","bin_id","UpperBound","Records","Exposure","Events","EventRate")];
-    
+
     #add back missing (if any)
     if(length(roll.up.adj.miss)>0){
       roll.up.adj.nomiss<-bind_rows(roll.up.adj.nomiss,roll.up.adj.miss)
