@@ -205,7 +205,7 @@ get_categorical_bins<-function(  df
             nbins_new$bin_id = bin_id_to_merge_with  #this is new
 
             #create new intervals;
-            NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,",",binend));
+            NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,"---*---",binend));
 
             nbins_new$bin_i<- NewValues;
 
@@ -290,7 +290,7 @@ get_categorical_bins<-function(  df
         nbins_new$bin_id<- j;
 
         #create new intervals;
-        NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,",",binend));
+        NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,"---*---",binend));
 
         nbins_new$bin_i<- NewValues;
 
@@ -425,7 +425,8 @@ get_categorical_bins<-function(  df
 
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable,Records,Events,EventRate,WOE,GRP) %>%
-    dplyr::summarise(bin_id = paste(bin_id, collapse = ",")) %>%
+    #dplyr::summarise(bin_id = paste(bin_id, collapse = ",")) %>%
+    dplyr::summarise(bin_id = paste(bin_id, collapse = "---*---")) %>%
     data.frame();
   CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")]
 
