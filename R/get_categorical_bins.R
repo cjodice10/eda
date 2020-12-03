@@ -417,7 +417,8 @@ get_categorical_bins<-function(  df
   #get data in the right format
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable) %>%
-    dplyr::mutate(bin_id = strsplit(bin_id,",")) %>%
+    #dplyr::mutate(bin_id = strsplit(bin_id,",")) %>%
+    dplyr::mutate(bin_id = strsplit(bin_id,"---*---")) %>%
     unnest %>%
     data.frame()
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
@@ -425,8 +426,7 @@ get_categorical_bins<-function(  df
 
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable,Records,Events,EventRate,WOE,GRP) %>%
-    #dplyr::summarise(bin_id = paste(bin_id, collapse = ",")) %>%
-    dplyr::summarise(bin_id = paste(bin_id, collapse = "---*---")) %>%
+    dplyr::summarise(bin_id = paste(bin_id, collapse = ",")) %>%
     data.frame();
   CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")]
 
