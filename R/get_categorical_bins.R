@@ -418,7 +418,7 @@ get_categorical_bins<-function(  df
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable) %>%
     #dplyr::mutate(bin_id = strsplit(bin_id,",")) %>%
-    dplyr::mutate(bin_id = strsplit(bin_id,"---*---")) %>%
+    dplyr::mutate(bin_id = strsplit(bin_id,"---*---"),fixed=TRUE) %>%
     unnest %>%
     data.frame()
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
