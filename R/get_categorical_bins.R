@@ -229,7 +229,9 @@ get_categorical_bins<-function(  df
 
             #remove rows i and j;
             nbins_start<- nbins_start[nbins_start$bin_id !=a,];
-            nbins_start<- nbins_start[nbins_start$bin_id !=j,];
+            #nbins_start<- nbins_start[nbins_start$bin_id !=j,];
+            nbins_start<- nbins_start[nbins_start$bin_id !=bin_id_to_merge_with,];
+
             #add in new rows;
             nbins_start<- rbind(nbins_new2,nbins_start);
             nbins_start$bin_id<- NULL;
@@ -382,6 +384,7 @@ get_categorical_bins<-function(  df
 
     #reorder;
     m6<- m6[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")];
+    m6$GRP = 1:nrow(m6)
 
     #Create a data set with this EDA;
     CategoricalEDA<- rbind(CategoricalEDA,m6);
