@@ -6,7 +6,7 @@ Author: Christopher Jodice
 Maintainer: Christopher Jodice <cjodice10@gmail.com>
 Description: This package was created to help with the EDA phase of modeling.
     It can be used when the dependent variable (DV) is either binary or frequency (like count given some type of exposure).  Talk about this package a bit more.
-License: MyLic
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Imports: dplyr (>= 0.8.5),
