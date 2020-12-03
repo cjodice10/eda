@@ -10,5 +10,7 @@ License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Imports: dplyr (>= 0.8.5),
-         stringr (>= 1.4.0)
+         stringr (>= 1.4.0),
+         tidyr (>= 1.0.2),
+         rlang (>= 0.4.5)
 RoxygenNote: 7.1.0

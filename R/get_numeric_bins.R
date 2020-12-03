@@ -15,7 +15,7 @@
 #'
 #' @return A list of dataframes.  First in the list will be 'Numeric_eda' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'numeric_iv' - This is a dataframe with each variable processed and their information value.  The last is 'numeric_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_numeric_logic(logic_df=numeric_logics)
 #' @export
-
+packageVersion('tidyr')
 get_numeric_bins<-function(  df                           # dataframe
                             ,dv                           # Dependent Varaible
                             ,dv.type                      # Binary, Frequency

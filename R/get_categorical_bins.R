@@ -1,7 +1,7 @@
 #' @title get_categorical_bins
 #'
 #' @description Categorical grouping
-#' 
+#'
 #' @param df A dataframe you are wanting to analyze
 #' @param dv The name of the dependent variable (dv).  Example: 'target'
 #' @param dv.type Can take on 1 of two inpunts - c('Binary','Frequency').  Both should be numeric.  If 'Frequency' is the input, it should be the numerator (if it is a rate).  The denominator will be specified as a separate parameter
@@ -10,7 +10,7 @@
 #' @param max.levels If a variable initially has more unique levels than max.levels, it will be skipped
 #' @param min.Pct The minimun percent of records a final bin should have.  Generally applies to only bins that are not NA
 #' @param tracking Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.
-#' 
+#'
 #' @return A list of dataframes.  First in the list will be 'CategoricalEDA' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'categorical_iv' - This is a dataframe with each variable processed and their information value.  The last is 'categorical_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_categorical_logic(logic_df=categorical_logics)
 #' @export
 
@@ -27,7 +27,7 @@ get_categorical_bins<-function(  df
   options(warn=-1)#use options(warn=0); to bring back warning
   options(scipen=999);
   `%ni%` = Negate(`%in%`);
-  
+
   #some basic checks
   if(!is.numeric(df[,dv])){
     stop(message("Dependent Variable must be numeric with values of 1 and 0.  A value of 1 signifies the 'event' you are trying to predict"))
@@ -41,22 +41,22 @@ get_categorical_bins<-function(  df
     message("Categorical variable list is empty.")
     return(NULL)
   }
-  
+
   if(dv.type %ni% c("Binary","Frequency")){
     stop("dv.type can only take on values c('Binary','Frequency')")
   }
-  
+
   if(!is.null(dv.denominator) && dv.denominator %ni% colnames(df)){
     stop("dv.denominator is not listed in your dataframe.  If your DV is purely a count variable (no exposure), then leave this NULL")
   }
-  
+
   if(min.Pct<=0 | min.Pct >=1){
     stop("min.Pct must be between 0 and 1:  (0,1)")
   }
-  
+
   #remove dv and denom from varlist
   var.list = var.list[var.list %ni% c(dv, dv.denominator)]
-  
+
   NbrRecords<-nrow(df)
 
   #create an empty table for summary edas;
@@ -86,7 +86,7 @@ get_categorical_bins<-function(  df
     tmpDF$bin_i   <-factor(tmpDF[,i]);
 
     lvls<-nlevels(tmpDF[,"bin_i"]);
-    
+
     message("Number of initial levels: ", lvls);
 
     if(lvls==1){
@@ -97,7 +97,7 @@ get_categorical_bins<-function(  df
       if(tracking==T){message("Skipping variable ",i," because the number of initial levels is > the max.levels parameter")}
       next
       };
-    
+
     #if all missing, then go to next variable
     if(sum(is.na(tmpDF[,i])) == nrow(tmpDF)){
       if(tracking==T){message("Skipping variable ",i," because the number all inputs are missing based on is.na() ")}
@@ -106,7 +106,7 @@ get_categorical_bins<-function(  df
 
     #tmpDF<-df[,c(i,dv)];
     #tmpDF$curr_var<-tmpDF[,i]
-    
+
     #if denominator is null, then make it 1
     if(is.null(dv.denominator)){
       tmpDF$dv.denominator<-1
@@ -181,46 +181,34 @@ get_categorical_bins<-function(  df
           if(a<nstart & br_i<min.Pct)
           {
             if(tracking==T){print("Minimum Percent of Records is not met - merging bins...")}
-            
-            message('a is: ',a);
-            message('after is: ',j);
-            message('before is: ',c)
-            print('nbins_start prior to merging...')
-            print(nbins_start)
-            print('')
+
             #create table with only the records needed and all columns;
             #nbins_new<- nbins_start[nbins_start$bin_id==a | nbins_start$bin_id==j,];
-            nbins_new<- nbins_start[nbins_start$bin_id==a | 
-                                    nbins_start$bin_id==j | 
+            nbins_new<- nbins_start[nbins_start$bin_id==a |
+                                    nbins_start$bin_id==j |
                                     nbins_start$bin_id==c,];
 
             #get differences EventRate
             curr_event_rate = nbins_new[which(nbins_new$bin_id==a),"EventRate"]
-            
+
             event_rate_checks      = nbins_new[nbins_new$bin_id %in% c(j,c),c("bin_id","EventRate")]
             event_rate_checks$diff = abs(event_rate_checks$EventRate - curr_event_rate)
             event_rate_checks      = event_rate_checks[order(event_rate_checks$diff),]
             bin_id_to_merge_with   = event_rate_checks[1,"bin_id"]
-            
+
             rownames(nbins_new)<-NULL;
 
             #create new bin id and set it both the same;
             nbins_new$bin_id<- bin_id_to_merge_with;
-            
+
             nbins_new        = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
             nbins_new$bin_id = bin_id_to_merge_with  #this is new
-            
-            print('merging with bin_id:');print(bin_id_to_merge_with)
-            print('nbins_new after selecting what to merge with - bin_id_to_merge_with');
-            print(nbins_new)
 
             #create new intervals;
             NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,",",binend));
-            
-            print('NewValues');print(NewValues)
 
             nbins_new$bin_i<- NewValues;
-            
+
             nbins_new2<- nbins_new %>%
               dplyr::group_by(bin_i,bin_id) %>%
               dplyr::summarise(  Records = sum(Records,na.rm=T)
@@ -230,7 +218,7 @@ get_categorical_bins<-function(  df
 
             nbins_new2$EventRate<- nbins_new2$Events/nbins_new2$Exposure;
             nbins_new2<-nbins_new2[order(nbins_new2$EventRate),]
-            
+
             rownames(nbins_new2)<-NULL;
 
             #get pct records;
@@ -238,7 +226,7 @@ get_categorical_bins<-function(  df
 
             #reorder columns;
             nbins_new2<- nbins_new2[,c("bin_i","Records","Exposure","PctRecords","Events","EventRate","bin_id")];
-            
+
             #remove rows i and j;
             nbins_start<- nbins_start[nbins_start$bin_id !=a,];
             nbins_start<- nbins_start[nbins_start$bin_id !=j,];
@@ -300,7 +288,7 @@ get_categorical_bins<-function(  df
 
         #create new bin id and set it both the same;
         nbins_new$bin_id<- j;
-        
+
         #create new intervals;
         NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,",",binend));
 
@@ -314,7 +302,7 @@ get_categorical_bins<-function(  df
           data.frame();
         nbins_new2$EventRate<- nbins_new2$Events/nbins_new2$Exposure;
         nbins_new2<-nbins_new2[order(nbins_new2$EventRate),]
-        
+
         rownames(nbins_new2)<-NULL;
 
         #get pct records;
@@ -344,7 +332,7 @@ get_categorical_bins<-function(  df
 
     #reassign bin_id;
     m6$bin_id<-1:nrow(m6);
-    
+
     #weight of evidence;
     total.bads <- sum(m6$Events)
     total.goods<- sum(m6$Records) - total.bads;
@@ -361,7 +349,7 @@ get_categorical_bins<-function(  df
                      ,round(log((Exposure/sum(Exposure)) / (Events/sum(Events))),4));
       })
     } else {print("WRONG dv.type INPUT")}
-    
+
     m6$GRP<- m6$bin_id;
 
     #calculate information values
@@ -375,12 +363,12 @@ get_categorical_bins<-function(  df
         temp<- WOE *  ((Exposure/sum(Exposure)) - (Events/sum(Events)))
       })
     }
-    
+
     iv.temp2    = data.frame(Variable=i,IV=0);
     iv.temp2$IV = sum(iv.temp$temp);
     iv.temp2$IV = round(iv.temp2$IV,5);
     iv.temp2$Variable = as.character(iv.temp2$Variable)
-    
+
     #remove bin_id;
     m6$bin_id = NULL;
 
@@ -394,7 +382,7 @@ get_categorical_bins<-function(  df
 
     #reorder;
     m6<- m6[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")];
-    
+
     #Create a data set with this EDA;
     CategoricalEDA<- rbind(CategoricalEDA,m6);
     rownames(CategoricalEDA)<-NULL;
@@ -414,16 +402,16 @@ get_categorical_bins<-function(  df
     m6<-NULL;
 
   }#END FOR LOOP FOR var.list
-  
+
   CategoricalEDA.fine<-CategoricalEDA;
   Info.Values        <-Info.Values[,c("Variable","IV")]
   Info.Values        <-Info.Values[order(-Info.Values$IV),]
-  
+
   #create logic
   #create logic to use
   CategoricalEDA.fine$GRP<- ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    <- CategoricalEDA.fine[order(CategoricalEDA.fine$Variable, CategoricalEDA.fine$GRP),]
-  
+
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
 
   #get data in the right format
@@ -433,28 +421,28 @@ get_categorical_bins<-function(  df
     unnest %>%
     data.frame()
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
-  
-  
+
+
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable,Records,Events,EventRate,WOE,GRP) %>%
     dplyr::summarise(bin_id = paste(bin_id, collapse = ",")) %>%
     data.frame();
   CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")]
-  
+
   #loop through each avariable
   for(i in unique(CategoricalEDA.fine$Variable)){
-    
+
     tmp_cat_eda_fine = CategoricalEDA.fine[which(CategoricalEDA.fine$Variable==i),]
     max_bin_id = max(tmp_cat_eda_fine$GRP)
-    
+
     #create logic
     tmp_cat_eda_fine<- within(tmp_cat_eda_fine,{
       woe_logic_2_use <- ifelse(GRP==-1,paste("if is.na(",i, ") then ",WOE,sep=""),paste("if ", i, " %in%  c(", bin_id, ") then ",WOE,sep=""))
-      
+
       grp_logic_2_use <- ifelse(GRP==-1,paste("if is.na(",i, ") then ",GRP,sep=""),paste("if ", i, " %in% c(", bin_id, ") then ",GRP,sep=""))
-      
+
     })
-    
+
     if(max_bin_id == 1){
       tmp_woe = tmp_cat_eda_fine[which(tmp_cat_eda_fine$GRP==1),"WOE"]
       tmp_cat_eda_fine[which(tmp_cat_eda_fine$GRP==1),]$woe_logic_2_use<-paste("if !is.na(",i,") then ",tmp_woe,sep="")
@@ -463,15 +451,15 @@ get_categorical_bins<-function(  df
     }
 
     CategoricalEDA.fine = CategoricalEDA.fine[which(CategoricalEDA.fine$Variable != i),]
-    
+
     #merge it back
     CategoricalEDA.fine = bind_rows(CategoricalEDA.fine,tmp_cat_eda_fine)
-    
+
   }
-  
+
   #reorder
   CategoricalEDA.fine = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
-  
+
   Logics.2.Use = CategoricalEDA.fine[,c("Variable","grp_logic_2_use","woe_logic_2_use")]
   CategoricalEDA.fine$grp_logic_2_use = NULL
   CategoricalEDA.fine$woe_logic_2_use = NULL
