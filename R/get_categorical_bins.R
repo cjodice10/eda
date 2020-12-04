@@ -208,17 +208,12 @@ get_categorical_bins<-function(  df
 
             nbins_new$bin_i<- NewValues;
 
-            message("print nbins_new before rollup");print(nbins_new)
-
             nbins_new2<- nbins_new %>%
               dplyr::group_by(bin_i,bin_id) %>%
               dplyr::summarise(  Records = sum(Records,na.rm=T)
                                 ,Exposure= sum(Exposure,na.rm=T)
                                 ,Events  = sum(Events,na.rm=T)) %>%
               data.frame();
-
-
-            message("print nbins_new after rollup");print(nbins_new2)
 
             nbins_new2$EventRate<- nbins_new2$Events/nbins_new2$Exposure;
             nbins_new2<-nbins_new2[order(nbins_new2$EventRate),]
@@ -418,10 +413,20 @@ get_categorical_bins<-function(  df
   Info.Values        <-Info.Values[,c("Variable","IV")]
   Info.Values        <-Info.Values[order(-Info.Values$IV),]
 
+
   #create logic
   #create logic to use
-  CategoricalEDA.fine$GRP<- ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
-  CategoricalEDA.fine    <- CategoricalEDA.fine[order(CategoricalEDA.fine$Variable, CategoricalEDA.fine$GRP),]
+  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable, CategoricalEDA.fine$GRP),]
+
+  CategoricalEDA.fine = CategoricalEDA.fine %>%
+    dplyr::group_by(Variable) %>%
+    dplyr::mutate(GRP = dplyr::row_number()) %>%
+    data.frame();
+
+
+  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine    = CategoricalEDA.fine[order(ategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
 
