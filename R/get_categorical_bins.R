@@ -444,6 +444,7 @@ get_categorical_bins<-function(  df
     data.frame()
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
 
+  message("After strsplit:");print(CategoricalEDA.fine)
 
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable,Records,Events,EventRate,WOE,GRP) %>%
