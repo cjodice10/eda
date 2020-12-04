@@ -416,8 +416,11 @@ get_categorical_bins<-function(  df
 
   #create logic
   #create logic to use
-  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
+  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-1,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable, CategoricalEDA.fine$GRP),]
+  message("Final1 - Adjusting '' values to be GRP -1");
+  print(CategoricalEDA.fine)
 
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable) %>%
@@ -425,10 +428,12 @@ get_categorical_bins<-function(  df
     data.frame();
 
 
-  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-1,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
+  message("Final2 - Adjusting '' values to be GRP -1");
+  print(CategoricalEDA.fine)
 
   #get data in the right format
   CategoricalEDA.fine = CategoricalEDA.fine %>%
