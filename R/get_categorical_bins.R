@@ -454,7 +454,6 @@ get_categorical_bins<-function(  df
 
   CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
-  print(CategoricalEDA.fine)
 
   #loop through each avariable
   for(i in unique(CategoricalEDA.fine$Variable)){
