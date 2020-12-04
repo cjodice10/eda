@@ -197,7 +197,6 @@ get_categorical_bins<-function(  df
             event_rate_checks      = event_rate_checks[order(event_rate_checks$diff),]
             bin_id_to_merge_with   = event_rate_checks[1,"bin_id"]
 
-            message("merging bin_id ",a," with bin_id ",bin_id_to_merge_with)
             rownames(nbins_new)<-NULL;
 
             nbins_new        = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
