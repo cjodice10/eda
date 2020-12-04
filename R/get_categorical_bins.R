@@ -158,6 +158,7 @@ get_categorical_bins<-function(  df
       #set j as the next bin;
       j<- ifelse(a+1 != nstart, a+1, nstart);
       c<- ifelse(a ==1, 0,ifelse(a+1==nrow(nbins_start),0,a-1))
+      #c<- ifelse(a ==1, 0,ifelse(a+1==nrow(nbins_start),0,a-1))
 
       #get values for bad rates on both bins;
       br_i<- nbins_start[nbins_start$bin_id==a,c("PctRecords")];
@@ -166,8 +167,8 @@ get_categorical_bins<-function(  df
 
       #get intervals;
       binbefore = nbins_start[nbins_start$bin_id==c,"bin_i"];
-      binstart<- nbins_start[nbins_start$bin_id==a,"bin_i"];
-      binend<-   nbins_start[nbins_start$bin_id==j,"bin_i"];
+      binstart  = nbins_start[nbins_start$bin_id==a,"bin_i"];
+      binend    = nbins_start[nbins_start$bin_id==j,"bin_i"];
 
       if(is.na(binstart) | is.nan(binstart) | is.null(binstart) | binstart=="<NA>" | binstart=="" | binstart==" " | is.na(binend) | is.nan(binend) | is.null(binend) | binend=="<NA>"  | binend=="" | binend==" " )
       {
@@ -196,6 +197,7 @@ get_categorical_bins<-function(  df
             event_rate_checks      = event_rate_checks[order(event_rate_checks$diff),]
             bin_id_to_merge_with   = event_rate_checks[1,"bin_id"]
 
+            message("merging bin_id ",a," with bin_id ",bin_id_to_merge_with)
             rownames(nbins_new)<-NULL;
 
             #create new bin id and set it both the same;
@@ -209,12 +211,17 @@ get_categorical_bins<-function(  df
 
             nbins_new$bin_i<- NewValues;
 
+            message("print nbins_new before rollup");print(nbins_new)
+
             nbins_new2<- nbins_new %>%
               dplyr::group_by(bin_i,bin_id) %>%
               dplyr::summarise(  Records = sum(Records,na.rm=T)
                                 ,Exposure= sum(Exposure,na.rm=T)
                                 ,Events  = sum(Events,na.rm=T)) %>%
               data.frame();
+
+
+            message("print nbins_new after rollup");print(nbins_new2)
 
             nbins_new2$EventRate<- nbins_new2$Events/nbins_new2$Exposure;
             nbins_new2<-nbins_new2[order(nbins_new2$EventRate),]
@@ -246,7 +253,8 @@ get_categorical_bins<-function(  df
             a<- 1;
             nstart<- max(nbins_start$bin_id);
 
-            br_i<-NULL;br_j<-NULL;j<-NULL;x<-NULL;y<-NULL;z<-NULL;NewValues<-NULL;
+            br_i<-NULL;br_j<-NULL;j<-NULL;x<-NULL;y<-NULL;z<-NULL;NewValues<-NULL;bin_id_to_merge_with<-NULL
+            j<-NULL;c<-NULL
           } #end loop for pct records
 
     } #end while loop;
@@ -338,6 +346,9 @@ get_categorical_bins<-function(  df
     #weight of evidence;
     total.bads <- sum(m6$Events)
     total.goods<- sum(m6$Records) - total.bads;
+
+    message("total events: ",total.bads);
+    message("total records: ",total.bads+total.goods)
 
     #create WOE
     if(dv.type=="Binary"){
