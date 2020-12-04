@@ -153,6 +153,7 @@ get_categorical_bins<-function(  df
 
     while(a<nstart)
     {
+      print(nbins_start)
       rownames(nbins_start)<-NULL;
 
       #set j as the next bin;
