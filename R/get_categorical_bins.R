@@ -200,9 +200,6 @@ get_categorical_bins<-function(  df
             message("merging bin_id ",a," with bin_id ",bin_id_to_merge_with)
             rownames(nbins_new)<-NULL;
 
-            #create new bin id and set it both the same;
-            nbins_new$bin_id<- bin_id_to_merge_with;
-
             nbins_new        = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
             nbins_new$bin_id = bin_id_to_merge_with  #this is new
 
