@@ -114,7 +114,7 @@ apply_categorical_logic <- function( main_df
   if(nrow(check_missing_df)>0){
     has_missing = list()
     for(i in colnames(check_missing_df)){
-      if(sum(is.na(check_missing_df[,i])>0){
+      if(sum(is.na(check_missing_df[,i]))>0){
         has_missing = cbind(has_missing,i)
       }
     }
