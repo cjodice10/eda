@@ -114,6 +114,9 @@ get_categorical_bins<-function(  df
       tmpDF$dv.denominator<- tmpDF[,dv.denominator]
     }
 
+
+    tmpDF$bin_i = as.character(tmpDF$bin_i)
+
     #aggregate data;
     nbins_start<- tmpDF %>%
       dplyr::group_by(bin_i) %>%
@@ -131,6 +134,12 @@ get_categorical_bins<-function(  df
 
     #order;
     nbins_start<- nbins_start[order(nbins_start$EventRate),];
+
+    #missing bin
+    missing_bin = nbins_start[which(is.na(nbins_start$bin_i)),]
+
+    #remove missing
+    nbins_start = nbins_start[which(!is.na(nbins_start$bin_i)),]
 
     nstart<- nrow(nbins_start);
 
@@ -154,6 +163,7 @@ get_categorical_bins<-function(  df
     while(a<nstart)
     {
       rownames(nbins_start)<-NULL;
+      message("a is: ",a)
 
       #set j as the next bin;
       j<- ifelse(a+1 != nstart, a+1, nstart);
@@ -169,6 +179,10 @@ get_categorical_bins<-function(  df
       binbefore = nbins_start[nbins_start$bin_id==c,"bin_i"];
       binstart  = nbins_start[nbins_start$bin_id==a,"bin_i"];
       binend    = nbins_start[nbins_start$bin_id==j,"bin_i"];
+
+      #message("....Previous: ",binbefore)
+      message("....binstart: ",binstart)
+      message("....binend: ",binend)
 
       if(is.na(binstart) | is.nan(binstart) | is.null(binstart) | binstart=="<NA>" | binstart=="" | binstart==" " | is.na(binend) | is.nan(binend) | is.null(binend) | binend=="<NA>"  | binend=="" | binend==" " )
       {
@@ -197,13 +211,20 @@ get_categorical_bins<-function(  df
             event_rate_checks      = event_rate_checks[order(event_rate_checks$diff),]
             bin_id_to_merge_with   = event_rate_checks[1,"bin_id"]
 
+            print(nbins_new)
+            message("merging bin_id: ",a, "   with bin_id: ",bin_id_to_merge_with)
+
             rownames(nbins_new)<-NULL;
 
             nbins_new        = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
+            print('about to merge these two rows');print(nbins_new)
             nbins_new$bin_id = bin_id_to_merge_with  #this is new
 
+            binstart = nbins_new[1,"bin_i"]
+            binend   = nbins_new[2,"bin_i"]
+
             #create new intervals;
-            NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,"---*---",binend));
+            NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,"*******",binend));
 
             nbins_new$bin_i<- NewValues;
 
@@ -225,21 +246,31 @@ get_categorical_bins<-function(  df
             #reorder columns;
             nbins_new2<- nbins_new2[,c("bin_i","Records","Exposure","PctRecords","Events","EventRate","bin_id")];
 
+            message("Merged bins:")
+            print(nbins_new2)
+            message("")
+
+            print('prior to removing a and j')
+            print(nbins_start)
             #remove rows i and j;
             nbins_start<- nbins_start[nbins_start$bin_id !=a,];
             #nbins_start<- nbins_start[nbins_start$bin_id !=j,];
             nbins_start<- nbins_start[nbins_start$bin_id !=bin_id_to_merge_with,];
+            print('after removing a and j')
+            print(nbins_start)
 
             #add in new rows;
-            nbins_start<- rbind(nbins_new2,nbins_start);
+            nbins_start<- bind_rows(nbins_new2,nbins_start);
             nbins_start$bin_id<- NULL;
 
-            #order by cf variable;
+            #order by eventrate variable;
             nbins_start<- nbins_start[order(nbins_start$EventRate),];
 
             #reassign bin_id;
             nbins_start$bin_id<-1:nrow(nbins_start);
 
+            print('after merging back')
+            print(nbins_start)
             #i<- ifelse(i==1,1,i-1);
             a<- 1;
             nstart<- max(nbins_start$bin_id);
@@ -291,7 +322,7 @@ get_categorical_bins<-function(  df
         nbins_new$bin_id<- j;
 
         #create new intervals;
-        NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,"---*---",binend));
+        NewValues<- ifelse(nbins_new[1,"bin_i"]=="<NA>","<NA>", paste0(binstart,"*******",binend));
 
         nbins_new$bin_i<- NewValues;
 
@@ -333,6 +364,12 @@ get_categorical_bins<-function(  df
 
     #reassign bin_id;
     m6$bin_id<-1:nrow(m6);
+
+    #if missing
+    if(nrow(missing_bin)>0){
+      missing_bin$bin_id = -9999
+      m6 = bind_rows(m6,missing_bin)
+    }
 
     #weight of evidence;
     total.bads <- sum(m6$Events)
@@ -413,7 +450,7 @@ get_categorical_bins<-function(  df
   #create logic
   #create logic to use
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
-  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-9999,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable, CategoricalEDA.fine$GRP),]
 
   CategoricalEDA.fine = CategoricalEDA.fine %>%
@@ -422,7 +459,7 @@ get_categorical_bins<-function(  df
     data.frame();
 
 
-  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-9999,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
@@ -432,7 +469,7 @@ get_categorical_bins<-function(  df
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable) %>%
     #dplyr::mutate(bin_id = strsplit(bin_id,",")) %>%
-    dplyr::mutate(bin_id = strsplit(bin_id,"---*---",fixed=TRUE)) %>%
+    dplyr::mutate(bin_id = strsplit(bin_id,"*******",fixed=TRUE)) %>%
     unnest(keep_empty=TRUE) %>%
     data.frame()
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
@@ -443,13 +480,13 @@ get_categorical_bins<-function(  df
     data.frame();
   CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")]
 
-  CategoricalEDA.fine$GRP= ifelse(CategoricalEDA.fine$bin_id %in% c("NA",""),-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine$GRP= ifelse(CategoricalEDA.fine$bin_id %in% c("NA",""),-9999,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
-  if(min(CategoricalEDA.fine$GRP)==-1){
-    missing.row        = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP==-1),]
+  if(min(CategoricalEDA.fine$GRP)==-9999){
+    missing.row        = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP==-9999),]
 
-    CategoricalEDA.tmp = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP!=-1),]
+    CategoricalEDA.tmp = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP!=-9999),]
 
     CategoricalEDA.tmp    = CategoricalEDA.tmp[order(CategoricalEDA.tmp$Variable,CategoricalEDA.tmp$GRP),]
     CategoricalEDA.tmp = CategoricalEDA.tmp %>%
@@ -476,9 +513,9 @@ get_categorical_bins<-function(  df
 
     #create logic
     tmp_cat_eda_fine<- within(tmp_cat_eda_fine,{
-      woe_logic_2_use <- ifelse(GRP==-1,paste("if is.na(",i, ") then ",WOE,sep=""),paste("if ", i, " %in%  c(", bin_id, ") then ",WOE,sep=""))
+      woe_logic_2_use <- ifelse(GRP==-9999,paste("if is.na(",i, ") then ",WOE,sep=""),paste("if ", i, " %in%  c(", bin_id, ") then ",WOE,sep=""))
 
-      grp_logic_2_use <- ifelse(GRP==-1,paste("if is.na(",i, ") then ",GRP,sep=""),paste("if ", i, " %in% c(", bin_id, ") then ",GRP,sep=""))
+      grp_logic_2_use <- ifelse(GRP==-9999,paste("if is.na(",i, ") then ",GRP,sep=""),paste("if ", i, " %in% c(", bin_id, ") then ",GRP,sep=""))
 
     })
 

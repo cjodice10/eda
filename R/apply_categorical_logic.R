@@ -115,7 +115,9 @@ apply_categorical_logic <- function( main_df
     has_missing = list()
     for(i in colnames(check_missing_df)){
       if(sum(is.na(check_missing_df[,i]))>0){
-        has_missing = cbind(has_missing,i)
+        i = substr(i,5,nchar(i))
+        has_missing = c(has_missing,i)
+        has_missing = unique(has_missing)
       }
     }
   }
@@ -123,7 +125,7 @@ apply_categorical_logic <- function( main_df
   if(length(has_missing)>0){
     message("");
     message("Warning -- The following variables had values that are not in the original logic.");
-    message(has_missing)
+    print(unlist(has_missing))
     message("");
   }
 
