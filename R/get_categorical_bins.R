@@ -153,7 +153,6 @@ get_categorical_bins<-function(  df
 
     while(a<nstart)
     {
-      print(nbins_start)
       rownames(nbins_start)<-NULL;
 
       #set j as the next bin;
@@ -339,9 +338,6 @@ get_categorical_bins<-function(  df
     total.bads <- sum(m6$Events)
     total.goods<- sum(m6$Records) - total.bads;
 
-    message("total events: ",total.bads);
-    message("total records: ",total.bads+total.goods)
-
     #create WOE
     if(dv.type=="Binary"){
       m6<- within(m6,{
@@ -419,8 +415,6 @@ get_categorical_bins<-function(  df
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
   CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-1,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable, CategoricalEDA.fine$GRP),]
-  message("Final1 - Adjusting '' values to be GRP -1");
-  print(CategoricalEDA.fine)
 
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable) %>%
@@ -432,8 +426,7 @@ get_categorical_bins<-function(  df
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
-  message("Final2 - Adjusting '' values to be GRP -1");
-  print(CategoricalEDA.fine)
+
 
   #get data in the right format
   CategoricalEDA.fine = CategoricalEDA.fine %>%
@@ -444,25 +437,36 @@ get_categorical_bins<-function(  df
     data.frame()
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
 
-  message("After strsplit:");print(CategoricalEDA.fine)
-
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable,Records,Events,EventRate,WOE,GRP) %>%
     dplyr::summarise(bin_id = paste(bin_id, collapse = ",")) %>%
     data.frame();
   CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")]
 
+  CategoricalEDA.fine$GRP= ifelse(CategoricalEDA.fine$bin_id %in% c("NA",""),-1,CategoricalEDA.fine$GRP)
+  CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
-  message("After strsplit and collapsing:");print(CategoricalEDA.fine)
+  if(min(CategoricalEDA.fine$GRP)==-1){
+    missing.row        = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP==-1),]
 
-  CategoricalEDA.fine = CategoricalEDA.fine %>%
-    dplyr::group_by(Variable) %>%
-    dplyr::mutate(GRP = dplyr::row_number()) %>%
-    data.frame();
+    CategoricalEDA.tmp = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP!=-1),]
+
+    CategoricalEDA.tmp    = CategoricalEDA.tmp[order(CategoricalEDA.tmp$Variable,CategoricalEDA.tmp$GRP),]
+    CategoricalEDA.tmp = CategoricalEDA.tmp %>%
+      dplyr::group_by(Variable) %>%
+      dplyr::mutate(GRP = dplyr::row_number()) %>%
+      data.frame();
+
+    CategoricalEDA.fine = bind_rows(CategoricalEDA.tmp,missing.row)
+    CategoricalEDA.fine = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
+  }
+
 
 
   #CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
+  #CategoricalEDA.fine$bin_id=gsub("'","\'",CategoricalEDA.fine$bin_id)
+  #CategoricalEDA.fine$bin_id=gsub('"',"\"",CategoricalEDA.fine$bin_id)
 
   #loop through each avariable
   for(i in unique(CategoricalEDA.fine$Variable)){
