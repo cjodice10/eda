@@ -2,6 +2,7 @@
 #'
 #' @description Categorical grouping
 #'
+#' @param run_id An identifier that will be used when outputting tables to the specified path (path_2_save parameter).  Example: 'MyRun1'
 #' @param df A dataframe you are wanting to analyze
 #' @param dv The name of the dependent variable (dv).  Example: 'target'
 #' @param dv.type Can take on 1 of two inpunts - c('Binary','Frequency').  Both should be numeric.  If 'Frequency' is the input, it should be the numerator (if it is a rate).  The denominator will be specified as a separate parameter
@@ -10,11 +11,13 @@
 #' @param max.levels If a variable initially has more unique levels than max.levels, it will be skipped
 #' @param min.Pct The minimun percent of records a final bin should have.  Generally applies to only bins that are not NA
 #' @param tracking Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.
+#' @param path_2_save A path to a folder to save a log file
 #'
 #' @return A list of dataframes.  First in the list will be 'CategoricalEDA' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'categorical_iv' - This is a dataframe with each variable processed and their information value.  The last is 'categorical_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_categorical_logic(logic_df=categorical_logics)
 #' @export
 
-get_categorical_bins<-function(  df
+get_categorical_bins<-function(  run_id
+                                ,df
                                 ,dv
                                 ,dv.type                      # Binary, Frequency
                                 ,dv.denominator = NULL        # Only used for exposure of frequency
@@ -22,6 +25,7 @@ get_categorical_bins<-function(  df
                                 ,max.levels     = 200         # if variable initially has more than these levels, skip it
                                 ,min.Pct
                                 ,tracking       = TRUE        # Do you want to track progress or not
+                                ,path_2_save    = getwd()
                                 ){
   #surpress warnings
   options(warn=-1)#use options(warn=0); to bring back warning
@@ -52,6 +56,15 @@ get_categorical_bins<-function(  df
 
   if(min.Pct<=0 | min.Pct >=1){
     stop("min.Pct must be between 0 and 1:  (0,1)")
+  }
+
+  if(tracking==TRUE){
+    write.table( data.frame(Logging = "Initial line in log file"),
+                 file=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),
+                 append = F,
+                 sep='\t',
+                 row.names=F,
+                 col.names=T )
   }
 
   #remove dv and denom from varlist
@@ -141,6 +154,17 @@ get_categorical_bins<-function(  df
     #remove missing
     nbins_start = nbins_start[which(!is.na(nbins_start$bin_i)),]
 
+
+    if(tracking==TRUE){
+      if(nrow(missing_bin)>0){
+        write_out_log_file(f="Missing bin",fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+        write_out_log_file(f=missing_bin  ,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+      }
+
+      #log origina bins
+      write_out_log_file(f="Original Binning",fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+      write_out_log_file(f=nbins_start       ,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+    }
     nstart<- nrow(nbins_start);
 
     #create bin ids;
@@ -246,18 +270,10 @@ get_categorical_bins<-function(  df
             #reorder columns;
             nbins_new2<- nbins_new2[,c("bin_i","Records","Exposure","PctRecords","Events","EventRate","bin_id")];
 
-            message("Merged bins:")
-            print(nbins_new2)
-            message("")
-
-            print('prior to removing a and j')
-            print(nbins_start)
             #remove rows i and j;
             nbins_start<- nbins_start[nbins_start$bin_id !=a,];
             #nbins_start<- nbins_start[nbins_start$bin_id !=j,];
             nbins_start<- nbins_start[nbins_start$bin_id !=bin_id_to_merge_with,];
-            print('after removing a and j')
-            print(nbins_start)
 
             #add in new rows;
             nbins_start<- bind_rows(nbins_new2,nbins_start);
@@ -269,15 +285,22 @@ get_categorical_bins<-function(  df
             #reassign bin_id;
             nbins_start$bin_id<-1:nrow(nbins_start);
 
-            print('after merging back')
-            print(nbins_start)
             #i<- ifelse(i==1,1,i-1);
             a<- 1;
             nstart<- max(nbins_start$bin_id);
 
             br_i<-NULL;br_j<-NULL;j<-NULL;x<-NULL;y<-NULL;z<-NULL;NewValues<-NULL;bin_id_to_merge_with<-NULL
             j<-NULL;c<-NULL
+
+            #write_out_log_file(f=paste("completed bin_id ",a," and now starting loop over from 1",sep=""),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+            #write_out_log_file(f=nbins_start,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+
+
           } #end loop for pct records
+
+      #write_out_log_file(f=paste("completed bin_id ",a," and now moving on",sep=""),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+      #write_out_log_file(f=nbins_start,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+
 
     } #end while loop;
 
@@ -442,6 +465,10 @@ get_categorical_bins<-function(  df
 
   }#END FOR LOOP FOR var.list
 
+  #write_out_log_file(f=paste("final grouping"),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+  #write_out_log_file(f=CategoricalEDA         ,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+
+
   CategoricalEDA.fine<-CategoricalEDA;
   Info.Values        <-Info.Values[,c("Variable","IV")]
   Info.Values        <-Info.Values[order(-Info.Values$IV),]
@@ -504,6 +531,9 @@ get_categorical_bins<-function(  df
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
   #CategoricalEDA.fine$bin_id=gsub("'","\'",CategoricalEDA.fine$bin_id)
   #CategoricalEDA.fine$bin_id=gsub('"',"\"",CategoricalEDA.fine$bin_id)
+
+  CategoricalEDA.fine$PctRecords = CategoricalEDA.fine$Records/NbrRecords
+  CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","PctRecords","Records","Events","EventRate","WOE","GRP")]
 
   #loop through each avariable
   for(i in unique(CategoricalEDA.fine$Variable)){

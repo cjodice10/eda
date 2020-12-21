@@ -62,13 +62,34 @@ process_pipeline = function( run_id                         # unique label to gi
   }
 
 
+  params_input = list()
+  params_input[["params"]] = list(
+     run_id           = run_id
+    ,df               = deparse(substitute(df))
+    ,unique_id_var    = unique_id_var
+    ,dv_var           = dv_var
+    ,dv_type          = dv_type
+    ,dv_denominator   = dv_denominator
+    ,var_list         = var_list
+    ,num_nbins        = num_nbins
+    ,num_min_pct      = num_min_pct
+    ,num_binning_type = num_binning_type
+    ,num_monotonic    = num_monotonic
+    ,cat_max_levels   = cat_max_levels
+    ,cat_min_pct      = cat_min_pct
+    ,eda_tracking     = eda_tracking
+    ,path_2_save      = path_2_save
+  )
+
+
   #numeric variable list
   numeric_vars_2_use = which(sapply(df, is.numeric))
   numeric_vars_2_use = names(numeric_vars_2_use)
   numeric_vars_2_use = numeric_vars_2_use[numeric_vars_2_use %in% var_list]
 
   #get numeric binning
-  numeric_eda_output<-get_numeric_bins(  df             = df
+  numeric_eda_output<-get_numeric_bins(  run_id         = run_id
+                                        ,df             = df
                                         ,dv             = dv_var
                                         ,dv.type        = dv_type
                                         ,dv.denominator = dv_denominator
@@ -78,6 +99,7 @@ process_pipeline = function( run_id                         # unique label to gi
                                         ,binning.Type   = num_binning_type
                                         ,monotonic      = num_monotonic
                                         ,tracking       = eda_tracking
+                                        ,path_2_save    = path_2_save
   )
 
   #nonnumeric variable list
@@ -87,7 +109,8 @@ process_pipeline = function( run_id                         # unique label to gi
   cat_vars_2_use = cat_vars_2_use[cat_vars_2_use %in% var_list]
 
   #get categorical binning
-  categorical_eda_output<-get_categorical_bins(  df             = df               # dataframe
+  categorical_eda_output<-get_categorical_bins(  run_id         = run_id
+                                                ,df             = df               # dataframe
                                                 ,dv             = dv_var          # Dependent Varaible
                                                 ,dv.type        = dv_type         # Binary, Frequency
                                                 ,dv.denominator = dv_denominator  # Only used for exposure of frequency
@@ -95,6 +118,7 @@ process_pipeline = function( run_id                         # unique label to gi
                                                 ,max.levels     = cat_max_levels  # >1
                                                 ,min.Pct        = cat_min_pct     # (0,1)
                                                 ,tracking       = eda_tracking    # Do you want to track progress or not
+                                                ,path_2_save    = path_2_save     # path to save log files
   )
 
   #save outputs
@@ -124,6 +148,6 @@ process_pipeline = function( run_id                         # unique label to gi
     message("")
   }
 
-  return(c(numeric_eda_output,categorical_eda_output))
+  return(c(numeric_eda_output,categorical_eda_output,params_input))
 }
 
