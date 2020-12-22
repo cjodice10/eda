@@ -90,7 +90,10 @@ get_categorical_bins<-function(  run_id
 
   #begin looping through
   for(i in var.list){
-    if(tracking==T){message("Variable: ",i)}
+    if(tracking==T){
+      message("Variable: ",i)
+      write_out_log_file(f=paste("Variable:",i),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+      }
 
     list.main.vars<-c(i,dv,dv.denominator)
     tmpDF         <-df[,list.main.vars];
@@ -100,25 +103,34 @@ get_categorical_bins<-function(  run_id
 
     lvls<-nlevels(tmpDF[,"bin_i"]);
 
-    message("Number of initial levels: ", lvls);
+   if(tracking==TRUE){
+     message("Number of initial levels: ", lvls)
+     write_out_log_file(f=paste("Number of initial levels: ", lvls),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+     };
 
-    if(lvls==1){
-      if(tracking==T){message("Skipping variable ",i," because the number of initial levels is 1")}
+   if(lvls==1){
+      if(tracking==T){
+        message("Skipping variable ",i," because the number of initial levels is 1")
+        write_out_log_file(f=paste("Skipping variable ",i," because the number of initial levels is 1"),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+        }
       next
       };
     if(lvls>max.levels){
-      if(tracking==T){message("Skipping variable ",i," because the number of initial levels is > the max.levels parameter")}
+      if(tracking==T){
+        message("Skipping variable ",i," because the number of initial levels is > the max.levels parameter")
+        write_out_log_file(f=paste("Skipping variable ",i," because the number of initial levels is > the max.levels parameter"),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+        }
       next
       };
 
     #if all missing, then go to next variable
     if(sum(is.na(tmpDF[,i])) == nrow(tmpDF)){
-      if(tracking==T){message("Skipping variable ",i," because the number all inputs are missing based on is.na() ")}
+      if(tracking==T){
+        message("Skipping variable ",i," because the number all inputs are missing based on is.na()")
+        write_out_log_file(f=paste("Skipping variable ",i," because the number all inputs are missing based on is.na()"),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+        }
       next
       }
-
-    #tmpDF<-df[,c(i,dv)];
-    #tmpDF$curr_var<-tmpDF[,i]
 
     #if denominator is null, then make it 1
     if(is.null(dv.denominator)){
@@ -175,6 +187,8 @@ get_categorical_bins<-function(  run_id
       message("");
       message("");
       message("Beginning to check the percent of records...");
+      write_out_log_file(f=paste("Beginning to check the percent of records..."),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+
     }
 
     ########################################################
@@ -187,7 +201,6 @@ get_categorical_bins<-function(  run_id
     while(a<nstart)
     {
       rownames(nbins_start)<-NULL;
-      message("a is: ",a)
 
       #set j as the next bin;
       j<- ifelse(a+1 != nstart, a+1, nstart);
@@ -204,10 +217,6 @@ get_categorical_bins<-function(  run_id
       binstart  = nbins_start[nbins_start$bin_id==a,"bin_i"];
       binend    = nbins_start[nbins_start$bin_id==j,"bin_i"];
 
-      #message("....Previous: ",binbefore)
-      message("....binstart: ",binstart)
-      message("....binend: ",binend)
-
       if(is.na(binstart) | is.nan(binstart) | is.null(binstart) | binstart=="<NA>" | binstart=="" | binstart==" " | is.na(binend) | is.nan(binend) | is.null(binend) | binend=="<NA>"  | binend=="" | binend==" " )
       {
         a<- a+1;
@@ -219,7 +228,10 @@ get_categorical_bins<-function(  run_id
         }else
           if(a<nstart & br_i<min.Pct)
           {
-            if(tracking==T){print("Minimum Percent of Records is not met - merging bins...")}
+            if(tracking==T){
+              print("Minimum Percent of Records is not met - merging bins...")
+              write_out_log_file(f=paste("Minimum Percent of Records is not met - merging bins..."),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+            }
 
             #create table with only the records needed and all columns;
             #nbins_new<- nbins_start[nbins_start$bin_id==a | nbins_start$bin_id==j,];
@@ -235,13 +247,16 @@ get_categorical_bins<-function(  run_id
             event_rate_checks      = event_rate_checks[order(event_rate_checks$diff),]
             bin_id_to_merge_with   = event_rate_checks[1,"bin_id"]
 
-            print(nbins_new)
-            message("merging bin_id: ",a, "   with bin_id: ",bin_id_to_merge_with)
-
             rownames(nbins_new)<-NULL;
 
-            nbins_new        = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
-            print('about to merge these two rows');print(nbins_new)
+            nbins_new = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
+
+            if(tracking==TRUE){
+              message("merging bin_id: ",a, "   with bin_id: ",bin_id_to_merge_with)
+              write_out_log_file(f=paste("merging bin_id: ",a, "   with bin_id: ",bin_id_to_merge_with),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+              write_out_log_file(f=nbins_new,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+
+            }
             nbins_new$bin_id = bin_id_to_merge_with  #this is new
 
             binstart = nbins_new[1,"bin_i"]
@@ -291,17 +306,7 @@ get_categorical_bins<-function(  run_id
 
             br_i<-NULL;br_j<-NULL;j<-NULL;x<-NULL;y<-NULL;z<-NULL;NewValues<-NULL;bin_id_to_merge_with<-NULL
             j<-NULL;c<-NULL
-
-            #write_out_log_file(f=paste("completed bin_id ",a," and now starting loop over from 1",sep=""),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
-            #write_out_log_file(f=nbins_start,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
-
-
           } #end loop for pct records
-
-      #write_out_log_file(f=paste("completed bin_id ",a," and now moving on",sep=""),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
-      #write_out_log_file(f=nbins_start,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
-
-
     } #end while loop;
 
     #if(tracking==TRUE){message('\nChecking last row')}
@@ -459,7 +464,9 @@ get_categorical_bins<-function(  run_id
       message("\n");
       message("Completed Binning Variable : ", i);
       message("\n");
-    }
+      write_out_log_file(f=paste("Completed Binning Variable : ", i),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+      }
+    ######}
 
     m6<-NULL;
 

@@ -238,6 +238,10 @@ get_numeric_bins<-function(  run_id
     #Check the percent of records in each bin;
     numbRows<- nrow(roll.up.adj.nomiss);
 
+    if(tracking==TRUE){
+      write_out_log_file(f=paste("checking percent of records"),fout=paste(path_2_save,"/",run_id,"-numeric_log_file.txt",sep=""),append=TRUE)
+    }
+
     a<-1;
     while(a<numbRows){
 
@@ -301,6 +305,11 @@ get_numeric_bins<-function(  run_id
           #roll.up.adj.nomiss_new$bin_id<- a;
           roll.up.adj.nomiss_new        = roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(a,bin_id_to_merge_with)),]
           roll.up.adj.nomiss_new$bin_id = bin_id_to_merge_with  #this is new
+
+          if(tracking==TRUE){
+            write_out_log_file(f=paste("bin_id ",a, "- merging with bin ",bin_id_to_merge_with, sep=""),fout=paste(path_2_save,"/",run_id,"-numeric_log_file.txt",sep=""),append=TRUE)
+            write_out_log_file(f=roll.up.adj.nomiss_new                  ,fout=paste(path_2_save,"/",run_id,"-numeric_log_file.txt",sep=""),append=TRUE)
+          }
 
           roll.up.adj.nomiss_new2<- roll.up.adj.nomiss_new %>%
             dplyr::group_by(Variable,bin_id) %>%
@@ -391,7 +400,12 @@ get_numeric_bins<-function(  run_id
 
     a<-1;
 
+    if(tracking==TRUE & isTRUE(monotonic)){
+      write_out_log_file(f=paste("checking monotonic binning...\n"),fout=paste(path_2_save,"/",run_id,"-numeric_log_file.txt",sep=""),append=TRUE)
+    }
+
     while(a<max.orig.rows  & isTRUE(monotonic)){
+
       rownames(roll.up.adj.nomiss)<-NULL;
 
       #set b as the next bin;
@@ -412,7 +426,7 @@ get_numeric_bins<-function(  run_id
       binstart<- roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==a,"UpperBound"];
       binend<-   roll.up.adj.nomiss[roll.up.adj.nomiss$bin_id==b,"UpperBound"];
 
-      if(tracking==TRUE){message("bin_id is : ",a," and rows are:")};
+      #if(tracking==TRUE){message("bin_id is : ",a," and rows are:")};
       #print(roll.up.adj.nomiss[which(roll.up.adj.nomiss$bin_id %in% c(a,b,c)),])
 
       if(is.na(binstart) | is.nan(binstart) | is.null(binstart) | binstart=="<NA>")
@@ -464,12 +478,13 @@ get_numeric_bins<-function(  run_id
           #create new bin id and set it both the same;
           #roll.up.adj.nomiss_new$bin_id<- a; #This was actual
           roll.up.adj.nomiss_new = roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(a,bin_id_to_merge_with)),]
-          roll.up.adj.nomiss_new$bin_id<- bin_id_to_merge_with  #this is new
 
           if(tracking==TRUE){
             write_out_log_file(f=paste("bin_id ",a, "- merging with bin ",bin_id_to_merge_with, sep=""),fout=paste(path_2_save,"/",run_id,"-numeric_log_file.txt",sep=""),append=TRUE)
             write_out_log_file(f=roll.up.adj.nomiss_new                  ,fout=paste(path_2_save,"/",run_id,"-numeric_log_file.txt",sep=""),append=TRUE)
           }
+
+          roll.up.adj.nomiss_new$bin_id<- bin_id_to_merge_with  #this is new
 
           roll.up.adj.nomiss_new2<-roll.up.adj.nomiss_new %>%
             dplyr::group_by(Variable,bin_id) %>%
