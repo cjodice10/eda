@@ -229,7 +229,7 @@ get_categorical_bins<-function(  run_id
           if(a<nstart & br_i<min.Pct)
           {
             if(tracking==T){
-              print("Minimum Percent of Records is not met - merging bins...")
+              #print("Minimum Percent of Records is not met - merging bins...")
               write_out_log_file(f=paste("Minimum Percent of Records is not met - merging bins..."),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
             }
 
@@ -249,14 +249,17 @@ get_categorical_bins<-function(  run_id
 
             rownames(nbins_new)<-NULL;
 
-            nbins_new = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
+            #nbins_new = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
+            nbins_new = nbins_new[which(nbins_new$bin_id %in% c(j,a,c)),]
+            nbins_new = nbins_new[order(nbins_new$bin_id),]
 
             if(tracking==TRUE){
-              message("merging bin_id: ",a, "   with bin_id: ",bin_id_to_merge_with)
+              #message("merging bin_id: ",a, "   with bin_id: ",bin_id_to_merge_with)
               write_out_log_file(f=paste("merging bin_id: ",a, "   with bin_id: ",bin_id_to_merge_with),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
               write_out_log_file(f=nbins_new,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
 
             }
+            nbins_new = nbins_new[which(nbins_new$bin_id %in% c(a,bin_id_to_merge_with)),]
             nbins_new$bin_id = bin_id_to_merge_with  #this is new
 
             binstart = nbins_new[1,"bin_i"]
