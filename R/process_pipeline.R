@@ -29,12 +29,12 @@ process_pipeline = function( run_id                         # unique label to gi
                             ,dv_type          = "Binary"    # "Binary" or "Frequency"
                             ,dv_denominator   = NULL        # if used, ensure the 'dv' represents the numerator
                             ,var_list                       # list of variables to conduct EDA on (do not include the dv)
-                            ,num_nbins        = 200         # >1
-                            ,num_min_pct      = 0.01        # (0,1)
+                            ,num_nbins        = 20          # >1
+                            ,num_min_pct      = 0.02        # (0,1)
                             ,num_binning_type = "Bucketing" # "Bucketing" or "Quantiles"
                             ,num_monotonic    = TRUE        # TRUE or FALSE
                             ,cat_max_levels   = 200         # if variable initially has more than these levels, skip it
-                            ,cat_min_pct      = 0.01        # (0,1)
+                            ,cat_min_pct      = 0.02        # (0,1)
                             ,eda_tracking     = TRUE        # do you want to track progress?
                             ,path_2_save      = getwd()     # path to save outputs
                             ){

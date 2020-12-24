@@ -24,8 +24,8 @@ get_numeric_bins<-function(  run_id
                             ,dv.type                      # Binary, Frequency
                             ,dv.denominator = NULL        # Only used for exposure of frequency
                             ,var.list                     # A list of numeric variables
-                            ,nbins          = 200         # >1
-                            ,min.Pct        = 0.05        # (0,1)
+                            ,nbins          = 20          # >1
+                            ,min.Pct        = 0.02        # (0,1)
                             ,binning.Type   = "Bucketing" # Bucketing or Quantiles
                             ,monotonic      = TRUE        # TRUE or FALSE
                             ,tracking       = TRUE        # Do you want to track progress or not

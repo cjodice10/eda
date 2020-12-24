@@ -183,14 +183,6 @@ get_categorical_bins<-function(  run_id
     nbins_start$bin_id<- 1:nstart;
     rownames(nbins_start)<-NULL;
 
-    if(tracking==T){
-      message("");
-      message("");
-      message("Beginning to check the percent of records...");
-      write_out_log_file(f=paste("Beginning to check the percent of records..."),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
-
-    }
-
     ########################################################
     #############Must Check Percent of Records##############
     ########################################################
@@ -230,7 +222,7 @@ get_categorical_bins<-function(  run_id
           {
             if(tracking==T){
               #print("Minimum Percent of Records is not met - merging bins...")
-              write_out_log_file(f=paste("Minimum Percent of Records is not met - merging bins..."),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+              write_out_log_file(f=paste("Looping through because minimum percent threshold is not met..."),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
             }
 
             #create table with only the records needed and all columns;
@@ -464,7 +456,6 @@ get_categorical_bins<-function(  run_id
     tmpDF$curr_var<- NULL;
 
     if(tracking==TRUE){
-      message("\n");
       message("Completed Binning Variable : ", i);
       message("\n");
       write_out_log_file(f=paste("Completed Binning Variable : ", i),fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
