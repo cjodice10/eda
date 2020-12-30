@@ -23,7 +23,7 @@ get_categorical_bins<-function(  run_id
                                 ,dv.denominator = NULL        # Only used for exposure of frequency
                                 ,var.list
                                 ,max.levels     = 200         # if variable initially has more than these levels, skip it
-                                ,min.Pct
+                                ,min.Pct        = 0.02
                                 ,tracking       = TRUE        # Do you want to track progress or not
                                 ,path_2_save    = getwd()
                                 ){
