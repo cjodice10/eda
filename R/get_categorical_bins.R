@@ -374,7 +374,7 @@ get_categorical_bins<-function(  run_id
         nbins_start<- rbind(nbins_new2,nbins_start);
         nbins_start$bin_id<- NULL;
 
-        #order by cf variable;
+        #order;
         nbins_start<- nbins_start[order(nbins_start$EventRate),];
 
         #reassign bin_id;
