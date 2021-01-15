@@ -2,15 +2,15 @@
 #'
 #' @description Categorical grouping
 #'
-#' @param run_id An identifier that will be used when outputting tables to the specified path (path_2_save parameter).  Example: 'MyRun1'
+#' @param run_id An identifier that will be used when naming output tables to the specified path (path_2_save parameter).  Example: 'MyRun1'
 #' @param df A dataframe you are wanting to analyze
 #' @param dv The name of the dependent variable (dv).  Example: 'target'
 #' @param dv.type Can take on 1 of two inpunts - c('Binary','Frequency').  Both should be numeric.  If 'Frequency' is the input, it should be the numerator (if it is a rate).  The denominator will be specified as a separate parameter
 #' @param dv.denominator The denominator of your dependent variable.  In many cases, this can be considered the exposure
 #' @param var.list A list of non-numeric variables to analyze and create bins for
 #' @param max.levels If a variable initially has more unique levels than max.levels, it will be skipped
-#' @param min.Pct The minimun percent of records a final bin should have.  Generally applies to only bins that are not NA
-#' @param tracking Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.
+#' @param min.Pct This is the minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)
+#' @param tracking Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE
 #' @param path_2_save A path to a folder to save a log file
 #'
 #' @return A list of dataframes.  First in the list will be 'CategoricalEDA' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'categorical_iv' - This is a dataframe with each variable processed and their information value.  The last is 'categorical_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_categorical_logic(logic_df=categorical_logics)

@@ -2,17 +2,17 @@
 #'
 #' @description Numeric grouping
 #'
-#' @param run_id An identifier that will be used when outputting tables to the specified path (path_2_save parameter).  Example: 'MyRun1'
+#' @param run_id An identifier that will be used when naming output tables to the specified path (path_2_save parameter).  Example: 'MyRun1'
 #' @param df A dataframe you are wanting to analyze
 #' @param dv The name of the dependent variable (dv).  Example: 'target'
 #' @param dv.type Can take on 1 of two inpunts - c('Binary','Frequency').  Both should be numeric.  If 'Frequency' is the input, it should be the numerator (if it is a rate).  The denominator will be specified as a separate parameter
 #' @param dv.denominator The denominator of your dependent variable.  In many cases, this can be considered the exposure
 #' @param var.list A list of non-numeric variables to analyze and create bins for
-#' @param nbins Maximum number of bins to initially split the variable into
-#' @param min.Pct The minimun percent of records a final bin should have.  Generally applies to only bins that are not NA
+#' @param nbins Maximum number of bins to initially split the variable into.  Default is 20
+#' @param min.Pct The minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)
 #' @param binning.Type The type of binning to use when splitting the variable.  One of two can be selected: c("Bucketing","Quantiles")
-#' @param monotonic Logical TRUE/FALSE input.  If TRUE, it will force the bins to be monotonic based on the event rate
-#' @param tracking Logical TRUE/FALSE input.  If set to TRUE, the user will be able to see what variable the function is analyzing.
+#' @param monotonic Logical TRUE/FALSE input.  If TRUE, it will force the bins to be monotonic based on the event rate.  Default is TRUE
+#' @param tracking Logical TRUE/FALSE input.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE
 #' @param path_2_save A path to a folder to save a log file
 #'
 #' @return A list of dataframes.  First in the list will be 'Numeric_eda' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'numeric_iv' - This is a dataframe with each variable processed and their information value.  The last is 'numeric_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_numeric_logic(logic_df=numeric_logics)
