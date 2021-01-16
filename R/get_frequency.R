@@ -1,11 +1,11 @@
 #' @title get_frequency
 #'
 #' @description Get frequency distribution of non-numeric variables
-#' 
+#'
 #' @param df A dataframe of variables
 #' @param vars A list of non-numeric variables to get frequencies for
 #' @param unique.threshold.pct A value between 0 and 1. If the number of unique values for a variable is > to this threshold, it will not output the frequency distribution.
-#' 
+#'
 #' @return A list of two.  Each being a dataframe.  First dataframe will give the frequency distribution to the variables.  The second dataframe will show the percent missing for each variable
 #'
 #' @export
@@ -71,7 +71,9 @@ get_frequency<-function(df,vars,unique.threshold.pct=0.8){
 
   #merge
   cat.pct.missing<- merge(  x     = cat.pct.missing
-                           ,y     = df.2.return[which(stringr::str_trim(df.2.return$Level)==""),c("Variable","Frequency","Percent")]
+                           ,y     = df.2.return[which(stringr::str_trim(df.2.return$Level)=="" |
+                                                      stringr::str_trim(df.2.return$Level)=="<NA>" |
+                                                      is.na(stringr::str_trim(df.2.return$Level))),c("Variable","Frequency","Percent")]
                            ,by.x  = c("Variable")
                            ,by.y  = c("Variable")
                            ,all.x = TRUE);
@@ -88,6 +90,9 @@ get_frequency<-function(df,vars,unique.threshold.pct=0.8){
                            ,by.x  = c("Variable")
                            ,by.y  = c("Variable")
                            ,all.x = TRUE);
+
+  cat.pct.missing$NonMissing = nbr.records - cat.pct.missing$NMissing
+  cat.pct.missing =  cat.pct.missing[,c("Variable","NonMissing","NMissing","PctMissing","UniqueValues")]
 
   #remove variables if needed
   df.2.return<- df.2.return[which(df.2.return$Variable %ni% remove.variables),]

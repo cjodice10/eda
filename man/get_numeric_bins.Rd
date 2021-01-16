@@ -5,19 +5,23 @@
 \title{get_numeric_bins}
 \usage{
 get_numeric_bins(
+  run_id,
   df,
   dv,
   dv.type,
   dv.denominator = NULL,
   var.list,
-  nbins = 200,
-  min.Pct = 0.05,
+  nbins = 20,
+  min.Pct = 0.02,
   binning.Type = "Bucketing",
   monotonic = TRUE,
-  tracking = TRUE
+  tracking = TRUE,
+  path_2_save = getwd()
 )
 }
 \arguments{
+\item{run_id}{An identifier that will be used when naming output tables to the specified path (path_2_save parameter).  Example: 'MyRun1'}
+
 \item{df}{A dataframe you are wanting to analyze}
 
 \item{dv}{The name of the dependent variable (dv).  Example: 'target'}
@@ -28,15 +32,17 @@ get_numeric_bins(
 
 \item{var.list}{A list of non-numeric variables to analyze and create bins for}
 
-\item{nbins}{Maximum number of bins to initially split the variable into}
+\item{nbins}{Maximum number of bins to initially split the variable into.  Default is 20}
 
-\item{min.Pct}{The minimun percent of records a final bin should have.  Generally applies to only bins that are not NA}
+\item{min.Pct}{The minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)}
 
 \item{binning.Type}{The type of binning to use when splitting the variable.  One of two can be selected: c("Bucketing","Quantiles")}
 
-\item{monotonic}{Logical TRUE/FALSE input.  If TRUE, it will force the bins to be monotonic based on the event rate}
+\item{monotonic}{Logical TRUE/FALSE input.  If TRUE, it will force the bins to be monotonic based on the event rate.  Default is TRUE}
 
-\item{tracking}{Logical TRUE/FALSE input.  If set to TRUE, the user will be able to see what variable the function is analyzing.}
+\item{tracking}{Logical TRUE/FALSE input.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE}
+
+\item{path_2_save}{A path to a folder to save a log file}
 }
 \value{
 A list of dataframes.  First in the list will be 'Numeric_eda' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'numeric_iv' - This is a dataframe with each variable processed and their information value.  The last is 'numeric_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_numeric_logic(logic_df=numeric_logics)

@@ -5,17 +5,21 @@
 \title{get_categorical_bins}
 \usage{
 get_categorical_bins(
+  run_id,
   df,
   dv,
   dv.type,
   dv.denominator = NULL,
   var.list,
   max.levels = 200,
-  min.Pct,
-  tracking = TRUE
+  min.Pct = 0.02,
+  tracking = TRUE,
+  path_2_save = getwd()
 )
 }
 \arguments{
+\item{run_id}{An identifier that will be used when naming output tables to the specified path (path_2_save parameter).  Example: 'MyRun1'}
+
 \item{df}{A dataframe you are wanting to analyze}
 
 \item{dv}{The name of the dependent variable (dv).  Example: 'target'}
@@ -28,9 +32,11 @@ get_categorical_bins(
 
 \item{max.levels}{If a variable initially has more unique levels than max.levels, it will be skipped}
 
-\item{min.Pct}{The minimun percent of records a final bin should have.  Generally applies to only bins that are not NA}
+\item{min.Pct}{This is the minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)}
 
-\item{tracking}{Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.}
+\item{tracking}{Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE}
+
+\item{path_2_save}{A path to a folder to save a log file}
 }
 \value{
 A list of dataframes.  First in the list will be 'CategoricalEDA' - this is an aggregated dataframe showing the groups created along with other key information.  The second is 'categorical_iv' - This is a dataframe with each variable processed and their information value.  The last is 'categorical_logics' - This is a dataframe with the information needed to apply to your dataframe and transform your variables.  This table will be the input to apply_categorical_logic(logic_df=categorical_logics)

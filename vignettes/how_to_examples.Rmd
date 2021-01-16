@@ -1,0 +1,246 @@
+---
+title: "eda"
+author: "Christopher Jodice"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Why eda?
+I created this package to help analyst have an easier way of conducting exploratory data analysis (eda) when using R. Historically I've used other products which have really good EDA tools in their software, but unfortunately can be real expensive.  So I wanted to create a package that can help others and ease their eda process using R.  My goal is that this `eda` package will give the analyst a tool to better understand their data and can easily represent some of the outputs to their clients.
+
+This package, as of now, mainly focuses on data sets where the analyst is either modeling a binary response, or a response that reflects count data (I allow the user to give an exposure variable as well if they are using count data).  This package will explore each attribute in the data by binning and grouping records based on user inputs and the dependent variable (DV).  For example, it may be that the user wants to force monotonic binning on numeric variables, this package will allow this.  
+
+After binning records together based on user specifications, we then transform the attribute to get a 'weight of evidence' (WOE) for each grouping.  This allows us to calculate how predictive an attribute might be by calculating it's information value (IV).  Because we calculate WOE, each variable can be transformed to a WOE value making all variables numeric - to include all missing values!.  This gives analyst some nice paths to move forward on.  When all variables can be translated to a numeric value, one can then take their analysis a step further and cluster variables together.  This can help an analyst to understand how each variable correlates to others. 
+
+### Note
+- Although examples of using variable clustering & selection are not part of this version, I do plan on adding this in future versions.
+
+- WOE variables are built such that as the WOE value goes up, the event rate goes down.  Therefore, if an analyst is using the transformed WOE variables in their statistical modeling, they should expect negative signs in their parameter estimates.  
+
+## Full disclosure
+The data set I am using was created by myself and is fitted on an equation.  So as you can imagine, the data is in good shape - which in almost all projects is unlikely.In fact, if you plot the raw covariates vs the DV, you will likely get really nice curves.  But for the sake of the demonstration on how to use this package, I will stick with this data set.  
+
+## Let's begin
+Let's first begin by bringing in a fake data set called `df_example` that comes with this package
+We'll also be using `dplyr` so we'll bring in that library
+
+```{r, echo=TRUE}
+#bring in the package
+library(eda)
+
+#bring in dplyr
+library(dplyr,warn.conflicts = FALSE)
+
+#bring in the example dataframe
+data("df_example",package="eda")
+
+#look at the structure
+str(df_example)
+
+```
+
+We see that this datframe `df_example` has 50,000 observations and 8 variables.
+
+- two categorical variables
+- 6 numeric or int variables
+
+Our dependent variable is called `target` and it is a binary response.
+
+Our first step is to get a summary of distributions for this data set.  We can easily do that with this package.  We will use the function `get_percentile()` for a summary on numeric variables and `get_frequency()` for a summary on non-numeric variables.  Let's first start with `get_percentile()`  We will pass the data frame and numeric column names to it
+
+```{r, echo=TRUE, results='asis'}
+#get a list of numeric variable names
+num_vars = names(df_example %>% dplyr::select_if(is.numeric))
+
+#numeric summary
+num_summary = get_percentile( df   = df_example
+                             ,vars = num_vars)
+
+#look at the structure
+knitr::kable(num_summary)
+
+```
+
+You will get in return a dataframe with a percentile distribution a long with other data like:
+
+- Percent Missing (PctMissing)
+- Number of unique values (UniqueValues)
+- Number of values less than 0 (LT0)
+- Number of values equal to 0 (ET0)
+- Number of values greather than 0 (GT0)
+
+You'll also get the percentile distribution of all numeric variables along with the mean and stdev.
+
+- You'll notice the event rate is about 18.3% for this data set
+
+You can see here that the 'ID' variable uniquely identifies each row.  It has 50K unique values.  We will be using this throughout.
+
+Next, let's take a look at `get_frequency()`  We will pass the data frame and non-numeric column names to it.  We will also pass 1 more parameter `unique.threshold.pct`  This tells the function to only calculate the output the frequency distribution of variables with less than this percent of unique values.  Imagine having 10,000 unique levels...this may take long to compute and also not easy to visually look at.  The function will return a list of two dataframes:
+
+- index 1 will hold a dataframe of the frequency distribution for each variable
+- index 2 will hold a dataframe that gives information about the number of unique levels and missing rates
+
+```{r, echo=TRUE}
+`%ni%` = Negate(`%in%`)
+
+#get a list of numeric variable names
+cat_vars = df_example[,colnames(df_example) %ni% num_vars] %>% colnames()
+
+#numeric summary
+cat_summary = get_frequency( df                   = df_example
+                            ,vars                 = cat_vars
+                            ,unique.threshold.pct = 0.8)
+
+#take a look at the structure
+str(cat_summary)
+
+#extract dataframe from first index
+cat_summary_frequencies = cat_summary[[1]]
+
+#look at the first few records of index 1
+knitr::kable(cat_summary_frequencies[1:10,])
+
+```
+
+Let's also look at the dataframe stored in the second index of `cat_summary`
+
+```{r, echo=TRUE}
+#extract dataframe
+cat_summary_missing_rates = cat_summary[[2]]
+
+#look at the first few records of index 1
+knitr::kable(cat_summary_missing_rates)
+
+```
+
+This dataframe can be combined with the `num_summary` output to get a complete view of all variables and their unique values and missing rates.
+
+```{r, echo=TRUE}
+#combine
+var_summary = bind_rows(num_summary[,1:5],cat_summary_missing_rates)
+
+#look at the first few records of index 1
+knitr::kable(var_summary)
+
+```
+
+## Split the data
+
+For our next step, let's quickly split the data by taking a random 70/30 random sample for a development and a holdout sample
+
+```{r, echo=TRUE}
+#sample size
+sample_size = floor(0.70 * nrow(df_example))
+
+#for reproducibility
+set.seed(1234)
+dev_ind = sample(seq_len(nrow(df_example)), size = sample_size)
+
+df_example_dev      = df_example[dev_ind, ]
+df_example_holdout  = df_example[-dev_ind, ]
+```
+
+The analyst should also re-run the functions we went over above on the development sample to ensure things look OK. But we will move forward
+
+## Main pipeline for our exploratory data analysis
+
+Let's push the data through the `process_pipeline()` function.  We are expecting this to return several pieces of information in a list.  A lot of the defaults are already set.  To make this run correctly, ensure that your dependent variable (DV) is not categorical.  Our DV is called `target` and we set the `dv_type` to 'Binary' because we are predicting a binary response.  This eda package only works for when the DV represents a binary input (1/0) or a count (frequency)
+
+```{r, echo=TRUE}
+
+#begin binning
+my_eda = process_pipeline( run_id           = 'MyRun1'
+                          ,df               = df_example_dev
+                          ,unique_id_var    = "id"
+                          ,dv_var           = "target"
+                          ,dv_type          = "Binary"
+                          ,var_list         = c("x1","x2","x3","x4","cat_var1","cat_var2")
+                          ,num_nbins        = 20
+                          ,num_min_pct      = 0.05
+                          ,num_monotonic    = FALSE
+                          ,cat_min_pct      = 0.05
+                          ,path_2_save      = "/Users/jodicefamily/Rprojects/Testing"
+)
+
+#let's look at the structure
+str(my_eda)
+
+```
+
+The output has produced several tables with quite a bit of information.  Let's first see the table it produced called `Numeric_eda` - but subset it to where `Variable` == 'x4'.
+
+```{r, echo=TRUE}
+library(ggplot2)
+num_eda = my_eda$Numeric_eda
+
+#look at variable x1
+num_eda_subset = num_eda[which(num_eda$Variable=="x4"),]
+knitr::kable(num_eda_subset,row.names = FALSE)
+
+```
+
+If one wanted to, this table can be used to create graphs to show the relationship with each variable and the DV.  It's a nice way of easily displaying the data.  Below, we'll easily display the relationship with the new variable and the percent of records in each bin (or grouping)
+
+```{r, echo=TRUE, fig.show='hold'}
+#now plot the event rate
+ggplot(num_eda_subset,aes(x=bin_id,y=EventRate)) +
+  geom_bar(stat="identity",color="azure", fill="aquamarine3")+
+  theme_bw()+
+  labs(title="Event Rate of Variable: x4")
+
+#now plot the percent records
+ggplot(num_eda_subset,aes(x=bin_id,y=PctRecords)) +
+  geom_bar(stat="identity",color="azure", fill="steelblue")+
+  theme_bw()+
+  labs(title="% of Records in each bin_id")
+
+```
+
+## Variable ranking
+We can rank variables and their predictive power by looking at their information values (IV).  This can be extracted from the output of the `process_pipeline()` we recently ran and assigned it to `my_eda`.  The names are called:
+
+- numeric_iv
+- categorical_iv
+
+Let's combine them together and then plot it to get a good view
+
+```{r, echo=TRUE, fig.show='hold'}
+ivs = bind_rows(my_eda$numeric_iv,my_eda$categorical_iv) %>% arrange(desc(IV)) %>% data.frame()
+ivs
+#now plot the event rate
+ivs %>%
+  arrange(desc(IV)) %>%
+  mutate(Variable=factor(Variable, levels=Variable)) %>%
+  ggplot(aes(x=Variable,y=IV)) +
+  geom_bar(stat="identity",color="azure", fill="aquamarine3")+
+  theme_bw()+
+  labs(title="Variable Ranking using IV's")
+
+```
+
+Above, we see that the variable 'x4' has the highest predictive power with a very large IV ... IV's fairly large like this would be considered 'suspicous' but that is a topic we won't dive into here.  We will keep moving forward for demonstration purposes.
+
+Using this, an analyst can set a minimum threshold on the IV to begin to remove variables if needed.  This still leaves the case of collinearity amongst other attributes, but again we won't be discussing that here.
+
+
+## What to be careful of
+
+- If the analyst is forcing monotonic binning on numeric attributes, you may get an information value that is really low if the attribute truely has a non-monotonic relationship with the DV.  Picture a U-shaped relationship.  A linear correlation on a U-shaped relationship will be near 0.  
+- For categorical data with text as inputs.  I would remove any comma's, quotation marks and escape characters before using this package.
+- Setting the initial `num_nbins` to something large (say 200 or 300) with `num_monotonic` = TRUE and a high `num_min_pct` may be innefficient.  
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))
