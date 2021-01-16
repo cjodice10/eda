@@ -31,7 +31,7 @@ After binning records together based on user specifications, we then transform t
 - WOE variables are built such that as the WOE value goes up, the event rate goes down.  Therefore, if an analyst is using the transformed WOE variables in their statistical modeling, they should expect negative signs in their parameter estimates.  
 
 ## Full disclosure
-The data set I am using was created by myself and is fitted on an equation.  So as you can imagine, the data is in good shape - which in almost all projects is unlikely.In fact, if you plot the raw covariates vs the DV, you will likely get really nice curves.  But for the sake of the demonstration on how to use this package, I will stick with this data set.  
+The data set I am using was created by myself and is fitted on an equation.  So as you can imagine, the data is in good shape - which in almost all projects is unlikely.  In fact, if you plot the raw covariates vs the DV, you will likely get really nice curves.  But for the sake of the demonstration on how to use this package, I will stick with this data set.  
 
 ## Let's begin
 Let's first begin by bringing in a fake data set called `df_example` that comes with this package
@@ -69,7 +69,7 @@ num_vars = names(df_example %>% dplyr::select_if(is.numeric))
 num_summary = get_percentile( df   = df_example
                              ,vars = num_vars)
 
-#look at the structure
+#show the table
 knitr::kable(num_summary)
 
 ```
@@ -84,7 +84,7 @@ You will get in return a dataframe with a percentile distribution a long with ot
 
 You'll also get the percentile distribution of all numeric variables along with the mean and stdev.
 
-- You'll notice the event rate is about 18.3% for this data set
+- You'll notice the event rate is about 18.4% for this data set
 
 You can see here that the 'ID' variable uniquely identifies each row.  It has 50K unique values.  We will be using this throughout.
 
