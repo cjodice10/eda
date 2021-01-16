@@ -88,7 +88,7 @@ You'll also get the percentile distribution of all numeric variables along with 
 
 You can see here that the 'ID' variable uniquely identifies each row.  It has 50K unique values.  We will be using this throughout.
 
-Next, let's take a look at `get_frequency()`  We will pass the data frame and non-numeric column names to it.  We will also pass 1 more parameter `unique.threshold.pct`  This tells the function to only calculate the output the frequency distribution of variables with less than this percent of unique values.  Imagine having 10,000 unique levels...this may take long to compute and also not easy to visually look at.  The function will return a list of two dataframes:
+Next, let's take a look at `get_frequency()`  We will pass the data frame and non-numeric column names to it.  We will also pass 1 more parameter `unique.threshold.pct`  This tells the function to only calculate and output the frequency distribution of variables with less than this percent of unique values.  Imagine having 10,000 unique levels...this may take long to compute and also not easy to visually look at.  The function will return a list of two dataframes:
 
 - index 1 will hold a dataframe of the frequency distribution for each variable
 - index 2 will hold a dataframe that gives information about the number of unique levels and missing rates
