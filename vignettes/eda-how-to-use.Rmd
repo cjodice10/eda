@@ -106,7 +106,7 @@ Next, let's take a look at `get_frequency()`  We will pass the data frame name a
 ```{r, echo=TRUE}
 `%ni%` = Negate(`%in%`)
 
-#get a list of numeric variable names
+#get a list of non-numeric variable names
 cat_vars = df_example[,colnames(df_example) %ni% num_vars] %>% colnames()
 
 #numeric summary
@@ -167,7 +167,7 @@ The analyst should also re-run the functions we went over above on the developme
 
 ## Conduct our EDA and understand relationships
 
-Let's push the data through the `process_pipeline()` function.  We are expecting this to return several pieces of information in a list.  A lot of the defaults are already set for this function.  To make this run correctly, ensure that your dependent variable (DV) is numeric.  Our DV is called `target` and we set the `dv_type` to 'Binary' because we are predicting a binary response.  This eda package only works for when the DV represents a binary input (1/0) or a count (frequency with possible exposure)
+Let's push the data through the `process_pipeline()` function.  We are expecting this to return several pieces of information in a list.  A lot of the defaults are already set for this function.  To make this run correctly, ensure that your dependent variable (DV) is numeric.  Our DV is called `target` and we set the `dv_type` parameter below to 'Binary' because we are predicting a binary response.  This eda package only works for when the DV represents a binary input (1/0) or a count (frequency with possible exposure)
 
 ```{r, echo=TRUE}
 
