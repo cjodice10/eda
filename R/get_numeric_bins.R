@@ -128,6 +128,7 @@ get_numeric_bins<-function(  run_id
       tmpDF$dv.denominator<- tmpDF[,dv.denominator]
     }
 
+    set.seed(1234)
     #bin using quantiles
     if(binning.Type=="Quantiles"){
       tmpDF$bin_id<- cut( x=tmpDF[,i]

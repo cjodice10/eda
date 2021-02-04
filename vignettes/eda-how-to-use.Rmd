@@ -232,6 +232,39 @@ ggplot(num_eda_subset,aes(x=bin_id,y=PctRecords)) +
 
 ```
 
+Let's now subset to a categorical variable and see the relationship
+
+```{r, echo=TRUE}
+cat_eda = my_eda$CategoricalEDA
+
+#look at variable x1
+cat_eda_subset = cat_eda[which(cat_eda$Variable=="cat_var1"),]
+knitr::kable(cat_eda_subset,row.names = FALSE)
+
+```
+
+Let's also plot it
+```{r, echo=TRUE, fig.show='hold'}
+#now plot the event rate
+ggplot(cat_eda_subset,aes(x=bin_id,y=EventRate)) +
+  geom_bar(stat="identity",color="azure", fill="aquamarine3")+
+  scale_x_discrete(name ="bin_id", 
+                    limits= cat_eda_subset$bin_id)+
+  theme_bw()+
+  labs(title="Event Rate of Variable: x1")
+
+#now plot the percent records
+ggplot(cat_eda_subset,aes(x=bin_id,y=PctRecords)) +
+  geom_bar(stat="identity",color="white", fill="steelblue")+
+  scale_x_discrete(name ="bin_id", 
+                    limits= cat_eda_subset$bin_id)+
+  theme_bw()+
+  labs(title="% of Records in each bin_id")
+
+```
+
+It should be noted that the EDA output dataframes for the numeric and categorical data are slightly different.  I did this for a reason and cannot remember why.  If this becomes an issue for users, I will go into the main code and make the necessary adjustments.
+
 ### Variable ranking
 We can rank variables and their predictive power by looking at their information values (IV).  This can be extracted from the output of the `process_pipeline()` we recently ran and assigned it to `my_eda`.  The names are called:
 
