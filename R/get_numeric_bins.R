@@ -611,6 +611,7 @@ get_numeric_bins<-function(  run_id
 
     #info values
     Info.Values<-dplyr::bind_rows(Info.Values,iv.temp2);
+    message("")
 
   } #end for(i in var.list)
 

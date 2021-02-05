@@ -62,7 +62,7 @@ str(df_example)
 
 ```
 
-We see that this datframe `df_example` has 50,000 observations and 8 variables.
+We see that this dataframe `df_example` has 50,000 observations and 8 variables.
 
 - two categorical variables
 - 6 numeric or int variables
@@ -131,7 +131,7 @@ Let's also look at the dataframe stored in the second index of `cat_summary`
 #extract dataframe from second index
 cat_summary_missing_rates = cat_summary[[2]]
 
-#look at the first few records of index 1
+#look at the table
 knitr::kable(cat_summary_missing_rates)
 
 ```
@@ -142,7 +142,7 @@ This dataframe can be combined with the `num_summary` output to get a complete v
 #combine
 var_summary = bind_rows(num_summary[,1:5],cat_summary_missing_rates)
 
-#look at the first few records of index 1
+#look at the table
 knitr::kable(var_summary)
 
 ```
