@@ -395,13 +395,15 @@ get_categorical_bins<-function(  run_id
     }
 
     #weight of evidence;
-    total.bads <- sum(m6$Events)
-    total.goods<- sum(m6$Records) - total.bads;
+    total.bads  = sum(m6$Events)
+    total.goods = sum(m6$Records) - total.bads;
+    total.gb    = total.bads+total.bads
 
+    #changed woe logic for when events =0
     #create WOE
     if(dv.type=="Binary"){
       m6<- within(m6,{
-        WOE<- ifelse(Events==0, round(log((((Records - Events) / total.goods) / 0.01)),4),
+        WOE<- ifelse(Events==0, round(log((((Records - Events) / total.goods) / (1/(total.gb+1)))),4),
                      ifelse(Events==Records,round(log((1 / total.goods) / (Events/total.bads)),4)   ,round(log(((Records - Events) / total.goods) / (Events/total.bads)),4)))
       })
     } else if(dv.type=="Frequency"){
