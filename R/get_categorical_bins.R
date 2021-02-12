@@ -397,7 +397,7 @@ get_categorical_bins<-function(  run_id
     #weight of evidence;
     total.bads  = sum(m6$Events)
     total.goods = sum(m6$Records) - total.bads;
-    total.gb    = total.bads+total.bads
+    total.gb    = total.bads+total.goods
 
     #changed woe logic for when events =0
     #create WOE

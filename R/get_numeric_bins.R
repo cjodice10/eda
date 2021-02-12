@@ -574,8 +574,7 @@ get_numeric_bins<-function(  run_id
     roll.up.orig = roll.up.adj.nomiss
     total.bads   = sum(roll.up.orig$Events)
     total.goods  = sum(roll.up.orig$Records) - total.bads;
-    total.gb     = total.bads+total.bads
-
+    total.gb     = total.bads+total.goods
 
     #change if no events in bin
     if(dv.type=="Binary"){
