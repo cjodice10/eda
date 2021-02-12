@@ -571,13 +571,16 @@ get_numeric_bins<-function(  run_id
     roll.up.adj.nomiss$bin_id<-1:nrow(roll.up.adj.nomiss);
 
     #weight of evidence;
-    roll.up.orig<-roll.up.adj.nomiss
-    total.bads <- sum(roll.up.orig$Events)
-    total.goods<- sum(roll.up.orig$Records) - total.bads;
+    roll.up.orig = roll.up.adj.nomiss
+    total.bads   = sum(roll.up.orig$Events)
+    total.goods  = sum(roll.up.orig$Records) - total.bads;
+    total.gb     = total.bads+total.bads
 
+
+    #change if no events in bin
     if(dv.type=="Binary"){
       roll.up.orig<- within(roll.up.orig,{
-        WOE<- ifelse(Events==0, round(log((((Records - Events) / total.goods) / 0.01)),4),
+        WOE<- ifelse(Events==0, round(log((((Records - Events) / total.goods) / (1/(total.gb+1)))),4), #ifelse(Events==0, round(log((((Records - Events) / total.goods) / 0.01)),4),
                      ifelse(Events==Records,round(log((1 / total.goods) / (Events/total.bads)),4)   ,round(log(((Records - Events) / total.goods) / (Events/total.bads)),4)))
       })
     } else if(dv.type=="Frequency"){
