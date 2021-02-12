@@ -500,7 +500,7 @@ get_categorical_bins<-function(  run_id
     dplyr::group_by(Variable) %>%
     #dplyr::mutate(bin_id = strsplit(bin_id,",")) %>%
     dplyr::mutate(bin_id = strsplit(bin_id,"*******",fixed=TRUE)) %>%
-    unnest(keep_empty=TRUE) %>%
+    tidyr::unnest(keep_empty=TRUE) %>%
     data.frame()
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
 
