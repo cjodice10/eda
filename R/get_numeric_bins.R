@@ -37,8 +37,9 @@ get_numeric_bins<-function(  run_id
   options(scipen=999);
   `%ni%` = Negate(`%in%`);
 
-  #if(!is.null(dv.denominator) & length(dv.denominator>0) & str_trim(dv.denominator)==" "){dv.denominator<-NULL}
-
+  message("\n-------------------------------------\n")
+  message("\nBinning numeric variables...\n")
+  message("\nChecking inputs...\n")
   #some basic checks
   if(is.null(dv)){
     stop("Must have a dv")
@@ -646,6 +647,9 @@ get_numeric_bins<-function(  run_id
   Logics.2.Use = NumericEDA.fine[,c("Variable","grp_logic_2_use","woe_logic_2_use")]
   NumericEDA.fine$grp_logic_2_use = NULL
   NumericEDA.fine$woe_logic_2_use = NULL
+
+  message("\nCompleted numeric binning!\n")
+  message("\n-------------------------------------\n")
 
   return(list(Numeric_eda=NumericEDA.fine,numeric_iv=Info.Values,numeric_logics=Logics.2.Use))
 }

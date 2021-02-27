@@ -32,6 +32,10 @@ get_categorical_bins<-function(  run_id
   options(scipen=999);
   `%ni%` = Negate(`%in%`);
 
+  message("\n-------------------------------------\n")
+  message("\nBinning categorical variables...\n")
+  message("\nChecking inputs...\n")
+
   #some basic checks
   if(!is.numeric(df[,dv])){
     stop(message("Dependent Variable must be numeric with values of 1 and 0.  A value of 1 signifies the 'event' you are trying to predict"))
@@ -560,6 +564,8 @@ get_categorical_bins<-function(  run_id
   CategoricalEDA.fine$grp_logic_2_use = NULL
   CategoricalEDA.fine$woe_logic_2_use = NULL
 
+  message("\nCompleted categorical binning!\n")
+  message("\n-------------------------------------\n")
 
   return(list(CategoricalEDA=CategoricalEDA.fine,categorical_iv=Info.Values,categorical_logics=Logics.2.Use))
 }
