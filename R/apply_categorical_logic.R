@@ -110,7 +110,7 @@ apply_categorical_logic <- function( main_df
   }
 
   #loop through to check any NA values
-  check_missing_df = df_2_return[,substr(colnames(df_2_return),1,4) %in% c("woe_","grp_")]
+  check_missing_df = df_2_return[,substr(colnames(df_2_return),1,4) %in% c("woe_","grp_")] %>% data.frame()
   if(nrow(check_missing_df)>0){
     has_missing = list()
     for(i in colnames(check_missing_df)){
