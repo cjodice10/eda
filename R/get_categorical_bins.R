@@ -197,7 +197,6 @@ get_categorical_bins<-function(  run_id
       #set j as the next bin;
       j<- ifelse(a+1 != nstart, a+1, nstart);
       c<- ifelse(a ==1, 0,ifelse(a+1==nrow(nbins_start),0,a-1))
-      #c<- ifelse(a ==1, 0,ifelse(a+1==nrow(nbins_start),0,a-1))
 
       #get values for bad rates on both bins;
       br_i<- nbins_start[nbins_start$bin_id==a,c("PctRecords")];
@@ -212,7 +211,6 @@ get_categorical_bins<-function(  run_id
       if(is.na(binstart) | is.nan(binstart) | is.null(binstart) | binstart=="<NA>" | binstart=="" | binstart==" " | is.na(binend) | is.nan(binend) | is.null(binend) | binend=="<NA>"  | binend=="" | binend==" " )
       {
         a<- a+1;
-        #message("binstart is NA or NaN");
       }else
         if(a<nstart & br_i>=min.Pct)
         {
@@ -304,8 +302,6 @@ get_categorical_bins<-function(  run_id
           } #end loop for pct records
     } #end while loop;
 
-    #if(tracking==TRUE){message('\nChecking last row')}
-
     #must check last row;
     rownames(nbins_start)<-NULL;
 
@@ -329,11 +325,9 @@ get_categorical_bins<-function(  run_id
     } else
       if(br_i>=min.Pct)
       {
-        #message("Last bin meets minimum percent of records.")
       }
     else
       {
-        #message("INSIDE LOOP due to the last row not having enough records...");
         j<- a-1;
 
         #create table with only the records needed and all columns;
@@ -440,7 +434,6 @@ get_categorical_bins<-function(  run_id
     m6$bin_i  = NULL;
 
     #variable name;
-    #m6$Variable<- paste0("bin.",i);
     m6$Variable<- i;
 
     #reorder;
@@ -528,13 +521,7 @@ get_categorical_bins<-function(  run_id
     CategoricalEDA.fine = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
   }
 
-
-
-  #CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id),-1,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
-  #CategoricalEDA.fine$bin_id=gsub("'","\'",CategoricalEDA.fine$bin_id)
-  #CategoricalEDA.fine$bin_id=gsub('"',"\"",CategoricalEDA.fine$bin_id)
-
   CategoricalEDA.fine$PctRecords = CategoricalEDA.fine$Records/NbrRecords
   CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","PctRecords","Records","Events","EventRate","WOE","GRP")]
 
