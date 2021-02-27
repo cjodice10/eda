@@ -246,9 +246,6 @@ get_numeric_bins<-function(  run_id
     a<-1;
     while(a<numbRows){
 
-      #set j as the next bin;
-      #b<- ifelse(a+1 != numbRows, a+1, numbRows);
-
       #set b as the next bin;
       b<- ifelse(a+1 != nrow(roll.up.adj.nomiss), a+1, nrow(roll.up.adj.nomiss));
       c<- ifelse(a ==1, 0,ifelse(a+1==nrow(roll.up.adj.nomiss),0,a-1))
@@ -278,9 +275,7 @@ get_numeric_bins<-function(  run_id
       if(is.na(binstart) | is.nan(binstart) | is.null(binstart) | binstart=="<NA>"|is.na(binstart) | is.nan(binend) | is.null(binend) | binend=="<NA>")
       {
         a<- a+1;
-        #message("binstart is NA or NaN");
       } else
-        #if((br_a>=min.Pct) & (br_b>=min.Pct)){
         if(br_a>=min.Pct){
           a<- a+1;
         } else{
@@ -390,11 +385,7 @@ get_numeric_bins<-function(  run_id
     #reorder
     roll.up.adj.nomiss<- roll.up.adj.nomiss[,c("Variable","bin_id","UpperBound","Records","Exposure","Events","EventRate")];
 
-
-
-
     #### end pct checking ####
-
 
     #max rows
     max.orig.rows<- nrow(roll.up.adj.nomiss);
@@ -412,7 +403,6 @@ get_numeric_bins<-function(  run_id
       #set b as the next bin;
       b<- ifelse(a+1 != nrow(roll.up.adj.nomiss), a+1, nrow(roll.up.adj.nomiss));
       c<- ifelse(a ==1, 0,ifelse(a+1==nrow(roll.up.adj.nomiss),0,a-1))
-      #c<- ifelse(a ==1, 0,a-1)
 
       roll.up.adj.nomiss<- roll.up.adj.nomiss[,c("Variable","bin_id","UpperBound","Records","Exposure","Events","EventRate")];
 
@@ -462,7 +452,6 @@ get_numeric_bins<-function(  run_id
           event_rate_checks$diff = abs(event_rate_checks$EventRate - curr_event_rate)
           event_rate_checks = event_rate_checks[order(event_rate_checks$diff),]
           bin_id_to_merge_with = event_rate_checks[1,"bin_id"]
-          #message("before checking logic, bin to merge is: ", bin_id_to_merge_with)
 
           #override rules
           if((sgn==1 & a !=1  & roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(b)),"EventRate"]==0 & roll.up.adj.nomiss_new[which(roll.up.adj.nomiss_new$bin_id %in% c(b)),"Records"]/NbrRecords < min.Pct)){
@@ -552,17 +541,6 @@ get_numeric_bins<-function(  run_id
 
     #reorder
     roll.up.adj.nomiss<- roll.up.adj.nomiss[,c("Variable","bin_id","UpperBound","Records","Exposure","Events","EventRate")];
-
-
-
-    #########################
-
-
-    ##### ADD BACK HERE #####
-
-
-    #########################
-
 
     #add back missing (if any)
     if(length(roll.up.adj.miss)>0){
