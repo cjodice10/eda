@@ -1,5 +1,5 @@
 ---
-title: "eda-how-to-use"
+title: "eda"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{eda-how-to-use}
@@ -175,7 +175,7 @@ The analyst should also re-run the functions we went over above on the developme
 
 ## Conduct our EDA and understand relationships
 
-Let's push the data through the `process_pipeline()` function.  We are expecting this to return several pieces of information in a list.  A lot of the defaults are already set for this function.  To make this run correctly, ensure that your dependent variable (DV) is numeric.  Our DV is called `target` and we set the `dv_type` parameter below to 'Binary' because we are predicting a binary response.  This eda package only works for when the DV represents a binary input (1/0) or a count (frequency with possible exposure)
+Let's push the data through the `process_pipeline()` function.  We are expecting this to return several pieces of information in a list.  A lot of the defaults are already set for this function.  To make this run correctly, ensure that your dependent variable (DV) is numeric.  Our DV is called `target` and we set the `dv_type` parameter below to 'Binary' because we are predicting a binary response.  This eda package only works for when the DV represents a binary input (1/0) or a count (frequency with possible exposure).  To understand more about the inputs of the function `process_pipeline`, just execute the command `?process_pipeline`
 
 ```{r, echo=TRUE}
 
@@ -215,6 +215,7 @@ num_eda = my_eda$Numeric_eda
 
 #look at variable x1
 num_eda_subset = num_eda[which(num_eda$Variable=="x1"),]
+num_eda_subset$bin_id = as.factor(num_eda_subset$bin_id)
 knitr::kable(num_eda_subset,row.names = FALSE)
 
 ```
@@ -228,7 +229,7 @@ ggplot(num_eda_subset,aes(x=bin_id,y=EventRate)) +
   scale_x_discrete(name ="bin_id", 
                     limits= sort(num_eda_subset$bin_id))+
   theme_bw()+
-  labs(title="Event Rate of Variable: x1")
+  labs(title="Event Rate for: x1")
 
 #now plot the percent records
 ggplot(num_eda_subset,aes(x=bin_id,y=PctRecords)) +
@@ -236,7 +237,7 @@ ggplot(num_eda_subset,aes(x=bin_id,y=PctRecords)) +
   scale_x_discrete(name ="bin_id", 
                     limits= sort(num_eda_subset$bin_id))+
   theme_bw()+
-  labs(title="% of Records in each bin_id")
+  labs(title="% of Records")
 
 ```
 
@@ -263,7 +264,7 @@ ggplot(cat_eda_subset,aes(x=GRP,y=EventRate)) +
   scale_x_discrete(name ="GRP", 
                     limits= cat_eda_subset$GRP)+
   theme_bw()+
-  labs(title="Event Rate of Variable: cat_var2")
+  labs(title="Event Rate for: cat_var2")
 
 #now plot the percent records
 ggplot(cat_eda_subset,aes(x=GRP,y=PctRecords)) +
@@ -271,7 +272,7 @@ ggplot(cat_eda_subset,aes(x=GRP,y=PctRecords)) +
   scale_x_discrete(name ="GRP", 
                     limits= cat_eda_subset$GRP)+
   theme_bw()+
-  labs(title="% of Records in each bin_id")
+  labs(title="% of Records")
 
 ```
 

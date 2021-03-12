@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: Christopher Jodice
 Maintainer: Christopher Jodice <cjodice10@gmail.com>
 Description: This package was created to help with the EDA phase of modeling.
-    It can be used when the dependent variable (DV) is either binary or frequency (like count given some type of exposure).  Talk about this package a bit more.
+    It can be used when the dependent variable (DV) is either binary or frequency (like count given some type of exposure).
 License: MIT
 Encoding: UTF-8
 LazyData: true
