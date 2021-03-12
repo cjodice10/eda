@@ -139,7 +139,7 @@ get_categorical_bins<-function(  run_id
       }
 
     #if denominator is null, then make it 1
-    if(is.null(dv.denominator)){
+    if(is.null(dv.denominator)|dv.type=="Binary"){
       tmpDF$dv.denominator<-1
     }else{
       tmpDF$dv.denominator<- tmpDF[,dv.denominator]
@@ -476,7 +476,7 @@ get_categorical_bins<-function(  run_id
     m6$Variable<- i;
 
     #reorder;
-    m6<- m6[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")];
+    m6<- m6[,c("Variable","bin_id","Records","Exposure","Events","EventRate","WOE","GRP")];
 
     m6_tmp = m6 %>% filter(GRP %in% c(-9999,-8888)) %>% data.frame()
     m6     = m6 %>% filter(GRP %ni% c(-9999,-8888)) %>% data.frame()
@@ -553,10 +553,10 @@ get_categorical_bins<-function(  run_id
   CategoricalEDA.fine$bin_id = paste("'",CategoricalEDA.fine$bin_id,"'",sep="")
 
   CategoricalEDA.fine = CategoricalEDA.fine %>%
-    dplyr::group_by(Variable,Records,Events,EventRate,WOE,GRP) %>%
+    dplyr::group_by(Variable,Records,Exposure,Events,EventRate,WOE,GRP) %>%
     dplyr::summarise(bin_id = paste(bin_id, collapse = ",")) %>%
     data.frame();
-  CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")]
+  CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","Records","Exposure","Events","EventRate","WOE","GRP")]
 
   CategoricalEDA.fine$GRP= ifelse(CategoricalEDA.fine$bin_id %in% c("NA",""),-9999,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
@@ -583,7 +583,7 @@ get_categorical_bins<-function(  run_id
 
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
   CategoricalEDA.fine$PctRecords = CategoricalEDA.fine$Records/NbrRecords
-  CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","PctRecords","Records","Events","EventRate","WOE","GRP")]
+  CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","PctRecords","Records","Exposure","Events","EventRate","WOE","GRP")]
 
   #loop through each avariable
   for(i in unique(CategoricalEDA.fine$Variable)){

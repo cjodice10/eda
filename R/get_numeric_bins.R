@@ -123,7 +123,7 @@ get_numeric_bins<-function(  run_id
     tmpDF$curr_var<-as.numeric(tmpDF[,i])
 
     #if denominator is null, then make it 1
-    if(is.null(dv.denominator)){
+    if(is.null(dv.denominator)|dv.type=="Binary"){
       tmpDF$dv.denominator<-1
     }else{
       tmpDF$dv.denominator<- tmpDF[,dv.denominator]
@@ -603,6 +603,7 @@ get_numeric_bins<-function(  run_id
   #create logic to use
   NumericEDA.fine$bin_id<- ifelse(is.na(NumericEDA.fine$UpperBound),-1,NumericEDA.fine$bin_id)
   NumericEDA.fine <- NumericEDA.fine[order(NumericEDA.fine$Variable, NumericEDA.fine$bin_id),]
+  NumericEDA.fine$GRP = NumericEDA.fine$bin_id
 
   for(i in unique(NumericEDA.fine$Variable)){
 
