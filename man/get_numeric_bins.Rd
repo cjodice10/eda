@@ -36,7 +36,7 @@ get_numeric_bins(
 
 \item{min.Pct}{The minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)}
 
-\item{binning.Type}{The type of binning to use when splitting the variable.  One of two can be selected: c("Bucketing","Quantiles")}
+\item{binning.Type}{The type of binning to use when splitting the variable.  One of two can be selected: c("Bucketing","Quantiles").  "Bucketing" uses the cut() function where breaks=nbins.  "Quantiles" uses the cut() function where breaks=c(-Inf, unique(quantile( tmpDF[,i],probs=seq(0,1, by=1/nbins),include.lowest=TRUE,na.rm=TRUE))))}
 
 \item{monotonic}{Logical TRUE/FALSE input.  If TRUE, it will force the bins to be monotonic based on the event rate.  Default is TRUE}
 
