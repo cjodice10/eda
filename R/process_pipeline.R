@@ -15,6 +15,7 @@
 #' @param num_monotonic For numeric variables, this is a Logical TRUE/FALSE input.  If TRUE, it will force the bins to be monotonic based on the event rate.  Default is TRUE
 #' @param cat_max_levels For non-numeric variables, if a variable initially has more unique levels than cat_max_levels, it will be skipped.  Default is 200
 #' @param cat_min_pct For non-numeric variables, this is the minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)
+#' @param bin_random_together This is the threshold to identify if a level belongs in a random bin.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.005 (or 0.5 percent)
 #' @param eda_tracking Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE
 #' @param path_2_save A path to a folder where the outputs will be stored.  Default is: getwd().  Or an example: /store/outputs/in/this/folder
 #'
@@ -22,21 +23,22 @@
 #' @export
 
 #process pipeline
-process_pipeline = function( run_id                         # unique label to give to output data sets
-                            ,df                             # dataframe to use
-                            ,unique_id_var                  # unique identifier in your data (must be 1 variable)
-                            ,dv_var                         # dependent variable (must be numeric)
-                            ,dv_type          = "Binary"    # "Binary" or "Frequency"
-                            ,dv_denominator   = NULL        # if used, ensure the 'dv' represents the numerator
-                            ,var_list                       # list of variables to conduct EDA on (do not include the dv)
-                            ,num_nbins        = 20          # >1
-                            ,num_min_pct      = 0.02        # (0,1)
-                            ,num_binning_type = "Bucketing" # "Bucketing" or "Quantiles"
-                            ,num_monotonic    = TRUE        # TRUE or FALSE
-                            ,cat_max_levels   = 200         # if variable initially has more than these levels, skip it
-                            ,cat_min_pct      = 0.02        # (0,1)
-                            ,eda_tracking     = TRUE        # do you want to track progress?
-                            ,path_2_save      = getwd()     # path to save outputs
+process_pipeline = function( run_id                            # unique label to give to output data sets
+                            ,df                                # dataframe to use
+                            ,unique_id_var                     # unique identifier in your data (must be 1 variable)
+                            ,dv_var                            # dependent variable (must be numeric)
+                            ,dv_type             = "Binary"    # "Binary" or "Frequency"
+                            ,dv_denominator      = NULL        # if used, ensure the 'dv' represents the numerator
+                            ,var_list                          # list of variables to conduct EDA on (do not include the dv)
+                            ,num_nbins           = 20          # >1
+                            ,num_min_pct         = 0.02        # (0,1)
+                            ,num_binning_type    = "Bucketing" # "Bucketing" or "Quantiles"
+                            ,num_monotonic       = TRUE        # TRUE or FALSE
+                            ,cat_max_levels      = 200         # if variable initially has more than these levels, skip it
+                            ,cat_min_pct         = 0.02        # (0,1)
+                            ,bin_random_together = 0.005       # (0,1)
+                            ,eda_tracking        = TRUE        # do you want to track progress?
+                            ,path_2_save         = getwd()     # path to save outputs
                             ){
 
   #surpress warnings

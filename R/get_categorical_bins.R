@@ -10,6 +10,7 @@
 #' @param var.list A list of non-numeric variables to analyze and create bins for
 #' @param max.levels If a variable initially has more unique levels than max.levels, it will be skipped
 #' @param min.Pct This is the minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)
+#' @param bin_random_together This is the threshold to identify if a level belongs in a random bin.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.005 (or 0.5 percent)
 #' @param tracking Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE
 #' @param path_2_save A path to a folder to save a log file
 #'
@@ -19,13 +20,14 @@
 get_categorical_bins<-function(  run_id
                                 ,df
                                 ,dv
-                                ,dv.type                      # Binary, Frequency
-                                ,dv.denominator = NULL        # Only used for exposure of frequency
+                                ,dv.type                           # Binary, Frequency
+                                ,dv.denominator      = NULL        # Only used for exposure of frequency
                                 ,var.list
-                                ,max.levels     = 200         # if variable initially has more than these levels, skip it
-                                ,min.Pct        = 0.02
-                                ,tracking       = TRUE        # Do you want to track progress or not
-                                ,path_2_save    = getwd()
+                                ,max.levels          = 200         # if variable initially has more than these levels, skip it
+                                ,min.Pct             = 0.02
+                                ,bin_random_together = 0.005
+                                ,tracking            = TRUE        # Do you want to track progress or not
+                                ,path_2_save         = getwd()
                                 ){
   #surpress warnings
   options(warn=-1)#use options(warn=0); to bring back warning
@@ -64,11 +66,11 @@ get_categorical_bins<-function(  run_id
 
   if(tracking==TRUE){
     write.table( data.frame(Logging = "Initial line in log file"),
-                 file=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),
-                 append = F,
-                 sep='\t',
-                 row.names=F,
-                 col.names=T )
+                 file               = paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),
+                 append             = F,
+                 sep                = '\t',
+                 row.names          = F,
+                 col.names          =T )
   }
 
   #remove dv and denom from varlist
@@ -77,9 +79,9 @@ get_categorical_bins<-function(  run_id
   NbrRecords<-nrow(df)
 
   #create an empty table for summary edas;
-  CategoricalEDA<-      data.frame(  Variable  = character()
-                                    ,bin_id    = character()
-                                    ,Values    = character()
+  CategoricalEDA<-      data.frame(  Variable   = character()
+                                    ,bin_id     = character()
+                                    ,Values     = character()
                                     ,Exposure   = double()
                                     ,Records    = double()
                                     ,Events     = double()
@@ -170,11 +172,38 @@ get_categorical_bins<-function(  run_id
     #remove missing
     nbins_start = nbins_start[which(!is.na(nbins_start$bin_i)),]
 
+    #remove random bin(s)
+    if(bin_random_together>0){
+      random_bin = nbins_start[which(nbins_start$PctRecords <bin_random_together),]
+      if(nrow(random_bin)>0){
+        random_value_list = unique(random_bin$bin_i)
+        random_bin = random_bin %>%
+          dplyr::summarise( bin_i    = paste(unique(bin_i),collapse="*******")
+                           ,Records  = sum(Records, na.rm=TRUE)
+                           ,Exposure = sum(Exposure,na.rm=TRUE)
+                           ,Events   = sum(Events  ,na.rm=TRUE))%>%
+          data.frame()
+
+        #event rate and pct records
+        random_bin$EventRate <- random_bin$Events/random_bin$Exposure
+        random_bin$PctRecords<- random_bin$Records/NbrRecords;
+
+        #remove random bins from nbins_start
+        nbins_start = nbins_start[which(nbins_start$bin_i %ni% random_value_list),]
+      }
+    }#end remove random bin(s)
+
 
     if(tracking==TRUE){
       if(nrow(missing_bin)>0){
         write_out_log_file(f="Missing bin",fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
         write_out_log_file(f=missing_bin  ,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+      }
+
+      if(nrow(random_bin)>0){
+        write_out_log_file(f="Random bin",fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+        write_out_log_file(f=random_bin  ,fout=paste(path_2_save,"/",run_id,"-categorical_log_file.txt",sep=""),append=TRUE)
+
       }
 
       #log origina bins
@@ -392,6 +421,12 @@ get_categorical_bins<-function(  run_id
       m6 = bind_rows(m6,missing_bin)
     }
 
+    #if random
+    if(nrow(random_bin)>0){
+      random_bin$bin_id = -8888
+      m6 = bind_rows(m6,random_bin)
+    }
+
     #weight of evidence;
     total.bads  = sum(m6$Events)
     total.goods = sum(m6$Records) - total.bads;
@@ -442,7 +477,15 @@ get_categorical_bins<-function(  run_id
 
     #reorder;
     m6<- m6[,c("Variable","bin_id","Records","Events","EventRate","WOE","GRP")];
+
+    m6_tmp = m6 %>% filter(GRP %in% c(-9999,-8888)) %>% data.frame()
+    m6     = m6 %>% filter(GRP %ni% c(-9999,-8888)) %>% data.frame()
     m6$GRP = 1:nrow(m6)
+
+    if(nrow(m6_tmp)>0){
+      m6 = bind_rows(m6,m6_tmp)
+      m6 = m6 %>% arrange(GRP) %>% data.frame()
+    }
 
     #Create a data set with this EDA;
     CategoricalEDA<- rbind(CategoricalEDA,m6);
@@ -473,22 +516,30 @@ get_categorical_bins<-function(  run_id
   Info.Values        <-Info.Values[,c("Variable","IV")]
   Info.Values        <-Info.Values[order(-Info.Values$IV),]
 
-
   #create logic
   #create logic to use
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
   CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-9999,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable, CategoricalEDA.fine$GRP),]
 
+  random_bins_tmp     = CategoricalEDA.fine %>% filter(GRP ==-8888) %>% data.frame()
+  CategoricalEDA.fine = CategoricalEDA.fine %>% filter(GRP !=-8888) %>% data.frame()
+
   CategoricalEDA.fine = CategoricalEDA.fine %>%
     dplyr::group_by(Variable) %>%
     dplyr::mutate(GRP = dplyr::row_number()) %>%
     data.frame();
 
-
   CategoricalEDA.fine$GRP= ifelse(is.na(CategoricalEDA.fine$bin_id)|CategoricalEDA.fine$bin_id=="",-9999,CategoricalEDA.fine$GRP)
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
+  CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
+
+  if(nrow(random_bins_tmp)>0){
+    CategoricalEDA.fine = bind_rows(CategoricalEDA.fine,random_bins_tmp)
+    CategoricalEDA.fine = CategoricalEDA.fine %>% arrange(Variable, GRP) %>% data.frame()
+    random_bins_tmp = NULL
+  }
   CategoricalEDA.fine$bin_id = as.character(CategoricalEDA.fine$bin_id)
 
 
@@ -511,9 +562,11 @@ get_categorical_bins<-function(  run_id
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
 
   if(min(CategoricalEDA.fine$GRP)==-9999){
-    missing.row        = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP==-9999),]
+    missing.row         = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP==-9999),]
+    random_bins_tmp     = CategoricalEDA.fine %>% filter(GRP ==-8888) %>% data.frame()
 
     CategoricalEDA.tmp = CategoricalEDA.fine[which(CategoricalEDA.fine$GRP!=-9999),]
+    CategoricalEDA.tmp = CategoricalEDA.tmp[which(CategoricalEDA.tmp$GRP!=-8888),]
 
     CategoricalEDA.tmp    = CategoricalEDA.tmp[order(CategoricalEDA.tmp$Variable,CategoricalEDA.tmp$GRP),]
     CategoricalEDA.tmp = CategoricalEDA.tmp %>%
@@ -522,6 +575,9 @@ get_categorical_bins<-function(  run_id
       data.frame();
 
     CategoricalEDA.fine = bind_rows(CategoricalEDA.tmp,missing.row)
+    if(nrow(random_bins_tmp)>0){
+      CategoricalEDA.fine = bind_rows(CategoricalEDA.fine,random_bins_tmp)
+    }
     CategoricalEDA.fine = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
   }
 

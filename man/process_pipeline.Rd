@@ -18,6 +18,7 @@ process_pipeline(
   num_monotonic = TRUE,
   cat_max_levels = 200,
   cat_min_pct = 0.02,
+  bin_random_together = 0.005,
   eda_tracking = TRUE,
   path_2_save = getwd()
 )
@@ -48,6 +49,8 @@ process_pipeline(
 \item{cat_max_levels}{For non-numeric variables, if a variable initially has more unique levels than cat_max_levels, it will be skipped.  Default is 200}
 
 \item{cat_min_pct}{For non-numeric variables, this is the minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)}
+
+\item{bin_random_together}{This is the threshold to identify if a level belongs in a random bin.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.005 (or 0.5 percent)}
 
 \item{eda_tracking}{Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE}
 

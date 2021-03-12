@@ -13,6 +13,7 @@ get_categorical_bins(
   var.list,
   max.levels = 200,
   min.Pct = 0.02,
+  bin_random_together = 0.005,
   tracking = TRUE,
   path_2_save = getwd()
 )
@@ -33,6 +34,8 @@ get_categorical_bins(
 \item{max.levels}{If a variable initially has more unique levels than max.levels, it will be skipped}
 
 \item{min.Pct}{This is the minimun percent of records a final bin should have.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.02 (or 2 percent)}
+
+\item{bin_random_together}{This is the threshold to identify if a level belongs in a random bin.  The input should be between (0,1).  Generally applies to only bins that are not NA.  Default is 0.005 (or 0.5 percent)}
 
 \item{tracking}{Logical TRUE/FALSE inputs.  If set to TRUE, the user will be able to see what variable the function is analyzing.  Default is TRUE}
 
