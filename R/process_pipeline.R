@@ -112,16 +112,17 @@ process_pipeline = function( run_id                            # unique label to
   cat_vars_2_use = cat_vars_2_use[cat_vars_2_use %in% var_list]
 
   #get categorical binning
-  categorical_eda_output<-get_categorical_bins(  run_id         = run_id
-                                                ,df             = df               # dataframe
-                                                ,dv             = dv_var          # Dependent Varaible
-                                                ,dv.type        = dv_type         # Binary, Frequency
-                                                ,dv.denominator = dv_denominator  # Only used for exposure of frequency
-                                                ,var.list       = cat_vars_2_use  # A list of numeric variables
-                                                ,max.levels     = cat_max_levels  # >1
-                                                ,min.Pct        = cat_min_pct     # (0,1)
-                                                ,tracking       = eda_tracking    # Do you want to track progress or not
-                                                ,path_2_save    = path_2_save     # path to save log files
+  categorical_eda_output<-get_categorical_bins(  run_id              = run_id
+                                                ,df                  = df                  # dataframe
+                                                ,dv                  = dv_var              # Dependent Varaible
+                                                ,dv.type             = dv_type             # Binary, Frequency
+                                                ,dv.denominator      = dv_denominator      # Only used for exposure of frequency
+                                                ,var.list            = cat_vars_2_use      # A list of numeric variables
+                                                ,max.levels          = cat_max_levels      # >1
+                                                ,min.Pct             = cat_min_pct         # (0,1)
+                                                ,bin_random_together = bin_random_together
+                                                ,tracking            = eda_tracking        # Do you want to track progress or not
+                                                ,path_2_save         = path_2_save         # path to save log files
   )
 
   #save outputs
