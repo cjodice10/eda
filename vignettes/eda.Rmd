@@ -55,10 +55,13 @@ Let's first begin by bringing in a fake data set called `df_example` that comes 
 We'll also be using `dplyr` and `ggplot2` so we'll bring in those libraries
 
 ```{r, echo=TRUE}
-#bring in the package
-library(eda)
+#install the package from github if needed
+#install_github( repo            = "cjodice10/eda"
+#               ,dependencies    = TRUE
+#               ,build_vignettes = TRUE)
 
-#bring in dplyr
+#attach some packages
+library(eda)
 library(dplyr,warn.conflicts = FALSE)
 library(ggplot2)
 
