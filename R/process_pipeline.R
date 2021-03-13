@@ -66,21 +66,22 @@ process_pipeline = function( run_id                            # unique label to
 
   params_input = list()
   params_input[["params"]] = list(
-     run_id           = run_id
-    ,df               = deparse(substitute(df))
-    ,unique_id_var    = unique_id_var
-    ,dv_var           = dv_var
-    ,dv_type          = dv_type
-    ,dv_denominator   = dv_denominator
-    ,var_list         = var_list
-    ,num_nbins        = num_nbins
-    ,num_min_pct      = num_min_pct
-    ,num_binning_type = num_binning_type
-    ,num_monotonic    = num_monotonic
-    ,cat_max_levels   = cat_max_levels
-    ,cat_min_pct      = cat_min_pct
-    ,eda_tracking     = eda_tracking
-    ,path_2_save      = path_2_save
+     run_id              = run_id
+    ,df                  = deparse(substitute(df))
+    ,unique_id_var       = unique_id_var
+    ,dv_var              = dv_var
+    ,dv_type             = dv_type
+    ,dv_denominator      = dv_denominator
+    ,var_list            = var_list
+    ,num_nbins           = num_nbins
+    ,num_min_pct         = num_min_pct
+    ,num_binning_type    = num_binning_type
+    ,num_monotonic       = num_monotonic
+    ,cat_max_levels      = cat_max_levels
+    ,bin_random_together = bin_random_together
+    ,cat_min_pct         = cat_min_pct
+    ,eda_tracking        = eda_tracking
+    ,path_2_save         = path_2_save
   )
 
 
