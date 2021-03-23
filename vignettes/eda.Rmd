@@ -14,9 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-# This Vignette is still in progress
 
-# Dependencies
+## Dependencies
 There are a few dependencies for this package and they are listed here.
 
 - dplyr (>= 0.8.5)
