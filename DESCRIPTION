@@ -1,6 +1,6 @@
 Package: eda
 Type: Package
-Title: Exploratory Data Analysis - Variable Groupings
+Title: Exploratory Data Analysis - Variable Groupings and Transformations
 Version: 0.1.0
 Author: Christopher Jodice
 Maintainer: Christopher Jodice <cjodice10@gmail.com>
