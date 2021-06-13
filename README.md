@@ -4,3 +4,6 @@ I created this package to help analyst have an easier way of conducting their ex
 This package, as of now, mainly focuses on data sets where the analyst is either modeling a binary response, or a response that reflects count data.  This package will explore each attribute in the data by binning and grouping records based on user inputs and the relationship with the dependent variable (DV).  For example, it may be that the user wants to force monotonic binning on numeric variables, this package will allow this.  
 
 Why bin variables though?  Well, depending on your analysis, binning does have it's benefits and at the same time has draw-backs.  The biggest draw-back is that when we bin variables to use in models, we naturally lose information, or lose the variability to be explained within the records of the bin.  But binning also has benefits.  It handles outliers very well, handles missing very well, and more.  
+
+Please read through the vignette eda.Rmd for an example!
+
