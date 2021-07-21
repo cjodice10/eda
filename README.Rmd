@@ -1,19 +1,34 @@
 ---
-title: "eda"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{eda-how-to-use}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output: github_document
 ---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
 )
 ```
 
+# eda
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+## Installation
+
+You can install the pacakge from github using:
+
+``` r
+install_github( repo            = "cjodice10/eda"
+               ,dependencies    = TRUE
+               ,build_vignettes = TRUE)
+```
+
+## Example
 
 ## Dependencies
 There are a few dependencies for this package and they are listed here.
