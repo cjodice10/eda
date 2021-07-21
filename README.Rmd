@@ -40,7 +40,9 @@ There are a few dependencies for this package and they are listed here.
 
 ## Why `eda`?
 I created this package to help analyst have an easier way of conducting their exploratory data analysis (`eda`) when using R. Historically I've used other products which have really good, some-what automated, EDA tools in their software, but unfortunately these products can be real expensive.  So I wanted to create a package that can help others and ease their `eda` process using R.  My goal is that this `eda` package will give the analyst a tool to better understand their data and can easily represent some of the outputs to their clients.
+
 This package, as of now, mainly focuses on data sets where the analyst is either modeling a binary response, or a response that reflects count data.  This package will explore each attribute in the data by binning and grouping records based on user inputs and the relationship with the dependent variable (DV).  For example, it may be that the user wants to force monotonic binning on numeric variables, this package will allow this.  
+
 Why bin variables though?  Well, depending on your analysis, binning does have it's benefits and at the same time has draw-backs.  The biggest draw-back is that when we bin variables to use in models, we naturally lose information, or lose the variability to be explained within the records of the bin.  But binning also has benefits.  It handles outliers very well, handles missing very well, and more.  
 
 Here are the steps we will take using this `eda` package
@@ -100,8 +102,8 @@ Our first step is to get a summary of distributions for this data set.  We can e
 num_vars = names(df_example %>% dplyr::select_if(is.numeric))
 
 #numeric summary
-num_summary = get_percentile(df   = df_example
-                              ,vars = num_vars)
+num_summary = get_percentile( df   = df_example
+                             ,vars = num_vars)
 
 #show the table
 knitr::kable(num_summary)
@@ -133,9 +135,9 @@ Next, let's take a look at `get_frequency()`  We will pass the data frame name a
 cat_vars = df_example[,colnames(df_example) %ni% num_vars] %>% colnames()
 
 #numeric summary
-cat_summary = get_frequency( df                   = df_example
-                              ,vars                 = cat_vars
-                              ,unique.threshold.pct = 0.8)
+cat_summary = get_frequency(  df                   = df_example
+                             ,vars                 = cat_vars
+                             ,unique.threshold.pct = 0.8)
 
 #take a look at the structure
 str(cat_summary)
@@ -196,17 +198,17 @@ Let's push the data through the `process_pipeline()` function.  We are expecting
 
 #begin binning
 my_eda = process_pipeline( run_id           = 'MyRun1'
-                            ,df               = df_example_dev
-                            ,unique_id_var    = "id"
-                            ,dv_var           = "target"
-                            ,dv_type          = "Binary"
-                            ,var_list         = c("x1","x2","x3","x4","cat_var1","cat_var2")
-                            ,num_nbins        = 20
-                            ,num_min_pct      = 0.05
-                            ,num_monotonic    = TRUE
-                            ,cat_min_pct      = 0.05
-                            ,eda_tracking     = TRUE
-                            ,path_2_save      = "/Users/jodicefamily/Rprojects/Testing"
+                          ,df               = df_example_dev
+                          ,unique_id_var    = "id"
+                          ,dv_var           = "target"
+                          ,dv_type          = "Binary"
+                          ,var_list         = c("x1","x2","x3","x4","cat_var1","cat_var2")
+                          ,num_nbins        = 20
+                          ,num_min_pct      = 0.05
+                          ,num_monotonic    = TRUE
+                          ,cat_min_pct      = 0.05
+                          ,eda_tracking     = TRUE
+                          ,path_2_save      = "/Users/jodicefamily/Rprojects/Testing"
 )
 
 #let's look at the names
@@ -241,16 +243,16 @@ If one wanted to, this table can be used to create graphs to show the relationsh
 #now plot the event rate
 ggplot(num_eda_subset,aes(x=bin_id,y=EventRate)) +
   geom_bar(stat="identity",color="azure", fill="aquamarine3")+
-  scale_x_discrete(name ="bin_id", 
-                    limits= sort(num_eda_subset$bin_id))+
+  scale_x_discrete( name   = "bin_id"
+                   ,limits = sort(num_eda_subset$bin_id))+
   theme_bw()+
   labs(title="Event Rate for: x1")
 
 #now plot the percent records
 ggplot(num_eda_subset,aes(x=bin_id,y=PctRecords)) +
   geom_bar(stat="identity",color="white", fill="steelblue")+
-  scale_x_discrete(name ="bin_id", 
-                    limits= sort(num_eda_subset$bin_id))+
+  scale_x_discrete( name   = "bin_id"
+                   ,limits = sort(num_eda_subset$bin_id))+
   theme_bw()+
   labs(title="% of Records")
 
@@ -276,16 +278,16 @@ Let's also plot it
 #now plot the event rate
 ggplot(cat_eda_subset,aes(x=GRP,y=EventRate)) +
   geom_bar(stat="identity",color="azure", fill="aquamarine3")+
-  scale_x_discrete(name ="GRP", 
-                    limits= cat_eda_subset$GRP)+
+  scale_x_discrete( name   = "GRP" 
+                   ,limits = cat_eda_subset$GRP)+
   theme_bw()+
   labs(title="Event Rate for: cat_var2")
 
 #now plot the percent records
 ggplot(cat_eda_subset,aes(x=GRP,y=PctRecords)) +
   geom_bar(stat="identity",color="white", fill="steelblue")+
-  scale_x_discrete(name ="GRP", 
-                    limits= cat_eda_subset$GRP)+
+  scale_x_discrete( name   = "GRP"
+                   ,limits = cat_eda_subset$GRP)+
   theme_bw()+
   labs(title="% of Records")
 
@@ -349,10 +351,10 @@ The `process_pipeline()` function just created groupings for each varaible, howe
 ```{r, echo=TRUE}
 numeric_logics = my_eda$numeric_logics
 
-num_transformed_df = apply_numeric_logic( main_df       = df_example_dev
-                                           ,logic_df      = numeric_logics
-                                           ,unique_key_id = "id"
-                                           ,logic_type    = "woe") #c("woe","grp")
+num_transformed_df = apply_numeric_logic(  main_df       = df_example_dev
+                                          ,logic_df      = numeric_logics
+                                          ,unique_key_id = "id"
+                                          ,logic_type    = "woe") #c("woe","grp")
 
 #look at a summary
 summary(num_transformed_df)
@@ -367,10 +369,10 @@ We will call the `apply_categorical_logic()` on the non-numeric attributes now
 ```{r, echo=TRUE}
 categorical_logics = my_eda$categorical_logics
 
-cat_transformed_df = apply_categorical_logic( main_df       = df_example_dev
-                                                ,logic_df      = categorical_logics
-                                                ,unique_key_id = "id"
-                                                ,logic_type    = "woe") #c("woe","grp")
+cat_transformed_df = apply_categorical_logic(  main_df       = df_example_dev
+                                              ,logic_df      = categorical_logics
+                                              ,unique_key_id = "id"
+                                              ,logic_type    = "woe") #c("woe","grp")
 
 #look at a summary
 summary(cat_transformed_df)
@@ -383,7 +385,7 @@ Now, we've told the function that the `unique_key_id` in our data set is the 'id
 
 ```{r, echo=TRUE}
 #merge transformed data together
-df_analytic_dev = merge(x      = num_transformed_df
+df_analytic_dev = merge(  x     = num_transformed_df
                          ,y     = cat_transformed_df
                          ,by.x  = c("id")
                          ,by.y  = c("id")
@@ -391,7 +393,7 @@ df_analytic_dev = merge(x      = num_transformed_df
                          ,all.y = TRUE)
 
 #now get the DV from original dev sample
-df_analytic_dev = merge(x      = df_analytic_dev
+df_analytic_dev = merge(  x     = df_analytic_dev
                          ,y     = df_example_dev[,c("id","target")]
                          ,by.x  = c("id")
                          ,by.y  = c("id")
