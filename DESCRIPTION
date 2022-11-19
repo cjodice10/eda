@@ -16,5 +16,5 @@ Imports: dplyr (>= 0.8.5),
 Depends: R (>= 2.10)
 Suggests: knitr, 
           rmarkdown
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.2
 VignetteBuilder: knitr

@@ -584,8 +584,9 @@ get_categorical_bins<-function(  run_id
   CategoricalEDA.fine    = CategoricalEDA.fine[order(CategoricalEDA.fine$Variable,CategoricalEDA.fine$GRP),]
   CategoricalEDA.fine$PctRecords = CategoricalEDA.fine$Records/NbrRecords
   CategoricalEDA.fine = CategoricalEDA.fine[,c("Variable","bin_id","PctRecords","Records","Exposure","Events","EventRate","WOE","GRP")]
+  CategoricalEDA.fine$EventRate<- CategoricalEDA.fine$EventRate*100
 
-  #loop through each avariable
+  #loop through each variable
   for(i in unique(CategoricalEDA.fine$Variable)){
 
     tmp_cat_eda_fine = CategoricalEDA.fine[which(CategoricalEDA.fine$Variable==i),]
