@@ -8,7 +8,7 @@
 
 ## Installation
 
-You can install the pacakge from github using:
+You can install the package from github using:
 
 ``` r
 install_github( repo            = "cjodice10/eda"
