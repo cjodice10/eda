@@ -107,7 +107,7 @@ process_pipeline = function( run_id                            # unique label to
 
   #nonnumeric variable list
 
-  cat_vars_2_use = df[, !(names(df) %in% names(df %>% dplyr::select_if(is.numeric)))]
+  cat_vars_2_use = df[, !(names(df) %in% names(df %>% dplyr::select_if(is.numeric))),drop=FALSE]
   cat_vars_2_use = names(cat_vars_2_use)
   cat_vars_2_use = cat_vars_2_use[cat_vars_2_use %in% var_list]
 
